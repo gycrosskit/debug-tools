@@ -3,6 +3,86 @@
 Android/iOS 的 Bug 草稿、提交状态、安全 Token 存储、本机历史、摇动触发、页面轨迹、有界证据格式化和禅道 REST 协议。复用现有
 `com.dgtang.debugtools.bugreport` API；不依赖宿主品牌、导航、业务模块或 Compose UI。
 
+## 架构与调用流程
+
+宿主提供表单 UI、证据、目标与生命周期；共用状态机组织提交，平台 Store 保存 Token 和本机历史。
+
+```mermaid
+flowchart TB
+    Host["宿主<br/>UI / 准入 / 生命周期"] --> VM["BugReportViewModel<br/>state + 操作"]
+    Data["宿主 BugReportHostDataSource"] --> VM
+    VM --> Repo["BugReportRepository"]
+    Repo --> Client["ZentaoBugClient<br/>专用 HttpClient"]
+    Client --> API["禅道 REST"]
+    Repo --> Store["BugReportStore<br/>Android / iOS 安全存储"]
+    Shake["平台 ShakeDetector"] --> Host
+```
+
+```mermaid
+sequenceDiagram
+    participant UI as UI
+    participant VM as ViewModel
+    participant Host as 宿主证据
+    participant R as Repository
+    participant S as Store
+    participant Z as REST 客户端
+    UI->>VM: submit()
+    VM->>VM: 校验标题并冻结输入
+    VM->>Host: captureContext()
+    Host-->>VM: BugReportContext
+    VM->>R: submit(draft, context, evidence)
+    R->>S: readToken()
+    S-->>R: Token
+    R->>Z: submit(...)
+    Z-->>R: 远端 Bug ID 与 URL
+    R->>S: 更新最近 20 条历史
+    alt 本机历史保存成功
+        R-->>VM: historySaved=true
+    else 普通存储异常
+        R-->>VM: historySaved=false
+    end
+    VM-->>UI: 更新 state
+```
+
+```mermaid
+classDiagram
+    class BugReportViewModel {
+        +state
+        +openForm()
+        +submit()
+    }
+    class BugReportRepository {
+        +submit(draft, context, evidence) BugSubmissionResult
+    }
+    class BugReportHostDataSource {
+        <<interface>>
+        +captureEvidence() BugEvidenceSnapshot
+        +captureContext() BugReportContext
+    }
+    class BugReportStore {
+        <<interface>>
+        +readToken() String
+        +writeHistory(value)
+    }
+    class ZentaoBugClient {
+        +submit(token, draft, context, evidence) BugSubmissionResult
+    }
+    class BugSubmissionResult {
+        +Int id
+        +String url
+        +Boolean historySaved
+    }
+    BugReportViewModel --> BugReportRepository
+    BugReportViewModel --> BugReportHostDataSource
+    BugReportRepository --> BugReportStore
+    BugReportRepository --> ZentaoBugClient
+    ZentaoBugClient ..> BugSubmissionResult
+```
+
+源码：[状态与证据冻结](src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportViewModel.kt)、[提交与历史语义](src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportRepository.kt)、[REST 实现](src/commonMain/kotlin/com/dgtang/debugtools/bugreport/ZentaoBugClient.kt)、[Store 契约](src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportStore.kt)、[宿主契约与结果](src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportModels.kt)。
+
+操作运行于 `viewModelScope`，取消会继续抛出 `CancellationException`；不能据此推断已发送的远端创建会回滚。Store 的 suspend 签名不自动切换线程，证据读取调度由宿主实现。摇动器由宿主在主线程生命周期中管理，[Android](src/androidMain/kotlin/com/dgtang/debugtools/shake/AndroidShakeDetector.kt) / [iOS](src/iosMain/kotlin/com/dgtang/debugtools/shake/IosShakeDetector.kt) 不创建收集协程；关闭或停用后不能由旧事件重新触发导航。
+
 ## 支持与安装
 
 | 项目 | 范围 |
