@@ -162,3 +162,11 @@ Native metadata 变体并重算校验文件，保留 common metadata、Android A
 | Maven | `0.1.3` |
 
 没有独立 Pod/SPM/HAR；Keychain 两项 runner 限制仍保留。候选尚待新版本远程验收，设备行为不由编译/链接推断。
+
+## 0.1.3 本地发布制品校验
+
+Fresh macOS staging 与归档解包复验均通过，全部 5 个 publication 的声明文件四类哈希、四类 sidecar、Apache-2.0 POM 及同名 available-at 目标身份均已校验。Maven 归档 SHA-256：`59fa9aadd5d869bed4f456937acf1e65316357d9d78accb80371a833da76b9de`。
+
+Maven `0.1.3`；没有额外原生源码发布渠道。
+
+新版本标签 / Release / JitPack 全变体下载与真实远程消费者仍待完成；本地验证不代替发布或设备验收。
