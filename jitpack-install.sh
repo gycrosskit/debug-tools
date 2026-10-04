@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-repository="debug-tools"
+repository="${1:?Pass the component repository name}"
 [[ "$repository" =~ ^[a-z0-9][a-z0-9-]*$ ]] || { echo 'Invalid repository name' >&2; exit 1; }
 : "${VERSION:?JitPack must provide an immutable tag}"
 checksum="$(awk -v version="$VERSION" '$1 == version {print $2}' release-checksums.txt)"

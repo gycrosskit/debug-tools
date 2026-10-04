@@ -10,6 +10,7 @@ import io.ktor.client.engine.mock.respond
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
+import io.ktor.http.content.OutgoingContent
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +48,34 @@ class BugReportViewModelTest {
             release.complete(Unit)
             fixture.viewModel.state.first { !it.working && it.submittedUrl.isNotBlank() }
             assertEquals(1, fixture.requests)
+        } finally {
+            release.complete(Unit)
+            fixture.close()
+            Dispatchers.resetMain()
+        }
+    }
+
+    @Test
+    fun `reopening form while context is pending cannot replace submitted evidence`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val fixture = BugViewModelFixture()
+        val started = CompletableDeferred<Unit>()
+        val release = CompletableDeferred<Unit>()
+        try {
+            fixture.viewModel.state.first { !it.loading }
+            fixture.evidence = BugEvidenceSnapshot(recentLogs = "frozen-evidence-marker")
+            fixture.viewModel.openForm()
+            fixture.viewModel.state.first { !it.working }
+            fixture.viewModel.updateTitle("Submitted title")
+            fixture.beforeContext = { started.complete(Unit); release.await() }
+            fixture.viewModel.submit()
+            started.await()
+            fixture.viewModel.openForm()
+            release.complete(Unit)
+            fixture.viewModel.state.first { !it.working && it.submittedUrl.isNotBlank() }
+
+            assertEquals(1, fixture.requests)
+            assertTrue(fixture.submittedBody.contains("frozen-evidence-marker"))
         } finally {
             release.complete(Unit)
             fixture.close()
@@ -133,7 +162,11 @@ private class BugViewModelFixture {
     val store = ViewModelBugStore()
     var requests = 0
     var beforeSubmit: suspend () -> Unit = {}
-    private val http = HttpClient(MockEngine {
+    var beforeContext: suspend () -> Unit = {}
+    var evidence = BugEvidenceSnapshot()
+    var submittedBody = ""
+    private val http = HttpClient(MockEngine { request ->
+        submittedBody = (request.body as OutgoingContent.ByteArrayContent).bytes().decodeToString()
         requests += 1
         beforeSubmit()
         respond("""{"id":42}""", HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, "application/json"))
@@ -153,9 +186,11 @@ private class BugViewModelFixture {
         factory = viewModelFactory {
             initializer {
                 BugReportViewModel(repository, object : BugReportHostDataSource {
-                    override suspend fun captureEvidence() = BugEvidenceSnapshot()
-                    override suspend fun captureContext() =
-                        BugReportContext("test-brand", BugReportPlatform.ANDROID, "1", "test", "test", 1)
+                    override suspend fun captureEvidence() = evidence
+                    override suspend fun captureContext(): BugReportContext {
+                        beforeContext()
+                        return BugReportContext("test-brand", BugReportPlatform.ANDROID, "1", "test", "test", 1)
+                    }
                 })
             }
         },
