@@ -12,7 +12,7 @@ Android/iOS 的 Bug 草稿、提交状态、安全 Token 存储、本机历史�
 | 依赖 | lifecycle-viewmodel 2.10.0、coroutines 1.10.2、serialization-json 1.9.0、Ktor 3.3.3 |
 | 产物 | Android Release AAR 与 KMP/iOS KLIB；不单独提供 Swift Package/XCFramework |
 
-固定发布坐标为 `com.github.gycrosskit.debug-tools:debug-tools:0.1.3`。当前 `0.1.3` 发布候选冻结提交 evidence，归档和新远程消费正在执行；旧 `0.1.2` 的 JitPack、Release SHA 与三架构/Framework 验收独立保留。
+固定发布坐标为 `com.github.gycrosskit.debug-tools:debug-tools:0.1.3`。当前 `0.1.3` 发布候选冻结提交 evidence，归档、全变体 HTTP 与新远程消费已通过；旧 `0.1.2` 的 JitPack、Release SHA 与三架构/Framework 验收独立保留。
 0.1.0 保留为首轮发布记录；其根坐标为聚合 POM，sources/metadata 变体存在 URL 改写，消费方使用 0.1.1。
 使用 `maven("https://jitpack.io")` 和以下依赖：
 
@@ -161,12 +161,16 @@ Native metadata 变体并重算校验文件，保留 common metadata、Android A
 | --- | --- |
 | Maven | `0.1.3` |
 
-没有独立 Pod/SPM/HAR；Keychain 两项 runner 限制仍保留。候选尚待新版本远程验收，设备行为不由编译/链接推断。
+没有独立 Pod/SPM/HAR；Keychain 两项 runner 限制仍保留。候选已完成发布与新版本远程消费；设备行为不由编译/链接推断。
 
-## 0.1.3 本地发布制品校验
+## 0.1.3 发布与远程验收
 
 Fresh macOS staging 与归档解包复验均通过，全部 5 个 publication 的声明文件四类哈希、四类 sidecar、Apache-2.0 POM 及同名 available-at 目标身份均已校验。Maven 归档 SHA-256：`59fa9aadd5d869bed4f456937acf1e65316357d9d78accb80371a833da76b9de`。
 
 Maven `0.1.3`；没有额外原生源码发布渠道。
 
-新版本标签 / Release / JitPack 全变体下载与真实远程消费者仍待完成；本地验证不代替发布或设备验收。
+不可变标签与 prerelease 已发布，所有 Release 附件重下载 SHA 与清单匹配。JitPack 新版本最终 ok/isTag/public 且 commit 匹配 tag，全部 5 module、6 个文件引用、5 个 available-at 的 HTTP/四类声明 hash/身份验证通过。新版真实远程 consumer 已通过；设备与业务 SDK 动作未验。
+
+精确 JitPack 0.1.3 新目录消费者：29 tasks / 28s，Android AAR、iOS 三架构编译及 simulator Framework。首次 fresh staging 因 SDK 路径缺省失败，归档入口补 ANDROID_HOME 默认值后定向重跑通过；没有重复整仓验证。
+
+实际日志与 JSON 账单位于 `build/remote-library-review/`。真实设备、业务账号登录/聊天/直播/PiP、权限 UI、真实 Bug/通知发送未执行。
