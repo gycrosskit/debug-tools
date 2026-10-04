@@ -10,7 +10,7 @@ kotlin {
     iosX64()
     iosSimulatorArm64 { binaries.framework { baseName = "DebugToolsConsumer" } }
     sourceSets.commonMain.dependencies {
-        implementation("com.github.gycrosskit:debug-tools:0.1.0")
+        implementation("com.github.gycrosskit.debug-tools:debug-tools:0.1.1")
     }
 }
 android {

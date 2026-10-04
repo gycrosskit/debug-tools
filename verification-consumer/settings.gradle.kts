@@ -14,7 +14,7 @@ dependencyResolutionManagement {
     repositories {
         maven("https://maven.aliyun.com/repository/google")
         maven("https://maven.aliyun.com/repository/public")
-        maven("https://jitpack.io") { content { includeGroup("com.github.gycrosskit") } }
+        maven("https://jitpack.io") { content { includeGroup("com.github.gycrosskit.debug-tools") } }
         google()
         mavenCentral()
     }
