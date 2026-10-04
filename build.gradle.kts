@@ -5,8 +5,8 @@ plugins {
     `maven-publish`
 }
 
-group = providers.environmentVariable("GROUP").orElse("com.github.gycrosskit").get()
-version = providers.environmentVariable("VERSION").orElse("0.1.0").get()
+group = providers.environmentVariable("GROUP").orElse("com.github.gycrosskit.debug-tools").get()
+version = providers.environmentVariable("VERSION").orElse("0.1.1").get()
 
 kotlin {
     androidTarget {
@@ -45,7 +45,7 @@ android {
 publishing {
     repositories.maven {
         name = "staging"
-        url = uri(layout.buildDirectory.dir("maven"))
+        url = uri(layout.buildDirectory.dir("maven/${project.version}"))
     }
     publications.withType<MavenPublication>().configureEach {
         pom {
