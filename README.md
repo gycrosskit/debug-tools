@@ -44,9 +44,9 @@ val model = BugReportViewModel(repository, hostDataSource)
 Android Release 必须由宿主依赖配置排除开发工具；iOS 同一 Framework 包含此代码时，正式环境通过宿主 DI/准入禁用，不创建或启动 detector。
 OpenHarmony 不在本组件范围。
 
-## 原生安全存储与摇动触发（待发布）
+## 原生安全存储与摇动触发
 
-以下新增 API 尚未包含在已发布的 0.1.1 中；验证和新版发布完成后才能通过新版固定坐标接入。
+以下 API 从 0.1.2 开始提供，旧 0.1.1 不包含这些能力。
 现有 `BugReportStore` 契约保持不变。Android 使用 Keystore AES/GCM 和私有 SharedPreferences，
 iOS 使用 Keychain 和 NSUserDefaults。迁移时传入原标识，不复制 Token 到新空间：
 
@@ -148,3 +148,11 @@ Native metadata 变体并重算校验文件，保留 common metadata、Android A
 [Apache-2.0](LICENSE) 发布。第三方依赖继续遵循各自许可证。
 源码与发布入口：[GitHub](https://github.com/gycrosskit/debug-tools)、[Release](https://github.com/gycrosskit/debug-tools/releases)、
 [Issues](https://github.com/gycrosskit/debug-tools/issues)。反馈只提交脱敏复现信息，不上传凭据或真实日志。
+
+## 当前工作树的未发布修复
+
+提交开始时冻结草稿与自动证据，异步采集上下文期间重新打开表单不会替换正在提交的证据。
+公开状态仍不暴露自动证据；导航切换与远端成功、本机历史失败语义保持。
+
+本轮 Android 22 项与 Simulator 23 项实际测试通过，另 2 项 Keychain 测试仍明确跳过；iOS arm64 编译通过。
+证据冻结回归用真实 ViewModel/MockEngine 先红后绿，没有发送真实 Bug 请求。

@@ -108,11 +108,12 @@ class BugReportViewModel(
             mutableState.update { it.copy(message = "请填写 Bug 标题", isError = true) }
             return
         }
+        val evidence = automaticEvidence
         runOperation(successMessage = "") {
             val result = repository.submit(
                 draft = current.draft,
                 context = hostDataSource.captureContext(),
-                evidence = automaticEvidence,
+                evidence = evidence,
             )
             mutableState.update {
                 it.copy(
