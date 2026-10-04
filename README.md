@@ -12,10 +12,10 @@ Android/iOS 的 Bug 草稿、提交状态、本机历史、页面轨迹、有界
 | 依赖 | lifecycle-viewmodel 2.10.0、coroutines 1.10.2、serialization-json 1.9.0、Ktor 3.3.3 |
 | 产物 | Android Release AAR 与 KMP/iOS KLIB；不单独提供 Swift Package/XCFramework |
 
-固定发布坐标为 `com.github.gycrosskit.debug-tools:debug-tools:0.1.1`。**0.1.0 已保留为首轮发布，JitPack 将其根坐标生成为聚合 POM，sources/metadata 变体也存在 URL 改写。
-0.1.1 使用上述实际 KMP 模块坐标并定向修正已证实的坏变体；JitPack 构建及
-远程 Android/iOS 消费验收尚未完成；发布状态以 [Release](https://github.com/gycrosskit/debug-tools/releases) 和验收记录为准。**
-远程发布验收完成后消费方使用 `maven("https://jitpack.io")` 和以下依赖：
+固定发布坐标为 `com.github.gycrosskit.debug-tools:debug-tools:0.1.1`。0.1.1 已完成 JitPack 构建、
+独立工程的远程 Android/iOS 三架构编译及 Simulator Framework 链接验收。
+0.1.0 保留为首轮发布记录；其根坐标为聚合 POM，sources/metadata 变体存在 URL 改写，消费方使用 0.1.1。
+使用 `maven("https://jitpack.io")` 和以下依赖：
 
 ```kotlin
 implementation("com.github.gycrosskit.debug-tools:debug-tools:0.1.1")
@@ -72,8 +72,9 @@ bash scripts/export-maven.sh
 
 输出 `build/release/debug-tools-maven-0.1.1.tar.gz` 和 `SHA256SUMS`。`jitpack.yml` 只运行
 `jitpack-install.sh`，从固定版本 GitHub Release 下载归档并校验仓库内 SHA-256，再安装全部
-Android/iOS Maven 变体；Linux 不现场生成 iOS KLIB。首次远程构建和消费仍在验收中，当前不宣称远程安装完成。
-已按组织共用模板移除 JitPack 改写出错误 URL/hash 的 sources 与 Native metadata 变体，保留 common metadata、Android AAR 和 iOS KLIB API/runtime 变体；源码仍可从 Git 标签读取。
+Android/iOS Maven 变体；Linux 不现场生成 iOS KLIB。0.1.1 的远程构建、下载、编译和 Simulator 链接均已通过，
+结果见 [开发与验证](docs/开发与验证.md)。归档前已按组织共用模板移除 JitPack 改写出错误 URL/hash 的 sources 与
+Native metadata 变体并重算校验文件，保留 common metadata、Android AAR 和 iOS KLIB API/runtime 变体；源码仍可从 Git 标签读取。
 
 组件由既有宿主的独立 Debug Tools 模块迁入，保留其 API 与行为契约；源码权利人已授权以
 [Apache-2.0](LICENSE) 发布。第三方依赖继续遵循各自许可证。
