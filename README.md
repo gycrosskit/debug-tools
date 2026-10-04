@@ -12,12 +12,12 @@ Android/iOS 的 Bug 草稿、提交状态、安全 Token 存储、本机历史�
 | 依赖 | lifecycle-viewmodel 2.10.0、coroutines 1.10.2、serialization-json 1.9.0、Ktor 3.3.3 |
 | 产物 | Android Release AAR 与 KMP/iOS KLIB；不单独提供 Swift Package/XCFramework |
 
-固定发布坐标为 `com.github.gycrosskit.debug-tools:debug-tools:0.1.2`。本版已完成 JitPack 构建、Release 下载 SHA 核验及独立工程真正远程 Android/iOS 三架构编译、Simulator Framework 链接验收。
+固定发布坐标为 `com.github.gycrosskit.debug-tools:debug-tools:0.1.3`。当前 `0.1.3` 发布候选冻结提交 evidence，归档和新远程消费正在执行；旧 `0.1.2` 的 JitPack、Release SHA 与三架构/Framework 验收独立保留。
 0.1.0 保留为首轮发布记录；其根坐标为聚合 POM，sources/metadata 变体存在 URL 改写，消费方使用 0.1.1。
 使用 `maven("https://jitpack.io")` 和以下依赖：
 
 ```kotlin
-implementation("com.github.gycrosskit.debug-tools:debug-tools:0.1.2")
+implementation("com.github.gycrosskit.debug-tools:debug-tools:0.1.3")
 ```
 
 ## 最小接入
@@ -126,7 +126,7 @@ staging 位于 `build/maven/<版本>`，不使用 `mavenLocal`。`verification-c
 在根目录运行：
 
 ```bash
-bash gradlew -p verification-consumer -PdebugToolsVersion=0.1.2 \
+bash gradlew -p verification-consumer -PdebugToolsVersion=0.1.3 \
   compileDebugKotlinAndroid compileKotlinIosArm64 compileKotlinIosX64 linkDebugFrameworkIosSimulatorArm64
 ```
 
@@ -149,10 +149,16 @@ Native metadata 变体并重算校验文件，保留 common metadata、Android A
 源码与发布入口：[GitHub](https://github.com/gycrosskit/debug-tools)、[Release](https://github.com/gycrosskit/debug-tools/releases)、
 [Issues](https://github.com/gycrosskit/debug-tools/issues)。反馈只提交脱敏复现信息，不上传凭据或真实日志。
 
-## 当前工作树的未发布修复
+## 0.1.3 发布候选
 
 提交开始时冻结草稿与自动证据，异步采集上下文期间重新打开表单不会替换正在提交的证据。
 公开状态仍不暴露自动证据；导航切换与远端成功、本机历史失败语义保持。
 
 本轮 Android 22 项与 Simulator 23 项实际测试通过，另 2 项 Keychain 测试仍明确跳过；iOS arm64 编译通过。
 证据冻结回归用真实 ViewModel/MockEngine 先红后绿，没有发送真实 Bug 请求。
+
+| 当前候选渠道 | 配套版本 |
+| --- | --- |
+| Maven | `0.1.3` |
+
+没有独立 Pod/SPM/HAR；Keychain 两项 runner 限制仍保留。候选尚待新版本远程验收，设备行为不由编译/链接推断。
