@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-# 从同版本不可变 Release 安装 macOS 生成的完整 AAR/KLIB，不在 Linux 重建 iOS。
-version=0.1.1
-[[ "${VERSION:?JitPack must provide VERSION}" == "$version" ]] || { echo "Unsupported version" >&2; exit 1; }
-archive="debug-tools-maven-${version}.tar.gz"
-curl -fL --retry 3 -o "$archive" "https://github.com/gycrosskit/debug-tools/releases/download/${version}/${archive}"
-sha256sum -c SHA256SUMS
+repository="debug-tools"
+[[ "$repository" =~ ^[a-z0-9][a-z0-9-]*$ ]] || { echo 'Invalid repository name' >&2; exit 1; }
+: "${VERSION:?JitPack must provide an immutable tag}"
+checksum="$(awk -v version="$VERSION" '$1 == version {print $2}' release-checksums.txt)"
+[[ "$checksum" =~ ^[a-f0-9]{64}$ ]] || { echo "No verified archive checksum for $VERSION" >&2; exit 1; }
+archive="${repository}-maven.tar.gz"
+curl -fL --retry 3 -o "$archive" "https://github.com/gycrosskit/${repository}/releases/download/${VERSION}/${archive}"
+echo "$checksum  $archive" | sha256sum -c -
 mkdir -p "$HOME/.m2/repository" build/release-maven
 tar -xzf "$archive" -C "$HOME/.m2/repository"
 tar -xzf "$archive" -C build/release-maven
+# 归档在 macOS 发布前已修正 metadata 并校验；此处仅校验并安装相同字节。
