@@ -1,6 +1,6 @@
 package com.dgtang.debugtools.bugreport
 
-/** Token 必须由平台安全存储实现；公共模块不接触 MMKV、SharedPreferences 或 Keychain 类型。 */
+/** Token 由原生安全存储实现；共用契约不暴露 SharedPreferences 或 Keychain 类型。 */
 interface BugReportStore {
     suspend fun readToken(): String
     suspend fun writeToken(value: String)

@@ -1,6 +1,6 @@
 # GY CrossKit Debug Tools
 
-Android/iOS 的 Bug 草稿、提交状态、本机历史、页面轨迹、有界证据格式化和禅道 REST 协议。复用现有
+Android/iOS 的 Bug 草稿、提交状态、安全 Token 存储、本机历史、摇动触发、页面轨迹、有界证据格式化和禅道 REST 协议。复用现有
 `com.dgtang.debugtools.bugreport` API；不依赖宿主品牌、导航、业务模块或 Compose UI。
 
 ## 支持与安装
@@ -12,13 +12,13 @@ Android/iOS 的 Bug 草稿、提交状态、本机历史、页面轨迹、有界
 | 依赖 | lifecycle-viewmodel 2.10.0、coroutines 1.10.2、serialization-json 1.9.0、Ktor 3.3.3 |
 | 产物 | Android Release AAR 与 KMP/iOS KLIB；不单独提供 Swift Package/XCFramework |
 
-固定发布坐标为 `com.github.gycrosskit.debug-tools:debug-tools:0.1.1`。0.1.1 已完成 JitPack 构建、
+固定发布坐标为 `com.github.gycrosskit.debug-tools:debug-tools:0.1.2`。0.1.1 已完成 JitPack 构建、
 独立工程的远程 Android/iOS 三架构编译及 Simulator Framework 链接验收。
 0.1.0 保留为首轮发布记录；其根坐标为聚合 POM，sources/metadata 变体存在 URL 改写，消费方使用 0.1.1。
 使用 `maven("https://jitpack.io")` 和以下依赖：
 
 ```kotlin
-implementation("com.github.gycrosskit.debug-tools:debug-tools:0.1.1")
+implementation("com.github.gycrosskit.debug-tools:debug-tools:0.1.2")
 ```
 
 ## 最小接入
@@ -35,15 +35,84 @@ val model = BugReportViewModel(repository, hostDataSource)
 // UI 观察 model.state，并调用 openForm、updateTitle、submit 等操作。
 ```
 
-宿主负责 `BugReportTarget` 的 HTTPS 地址、产品/分支、账号授权 UI、专用 TLS Engine、安全 Token Store、
-证据采集与隐私门禁、摇一摇传感器、表单 UI、文案本地化和 ViewModel 生命周期。未配置使用
+宿主负责 `BugReportTarget` 的 HTTPS 地址、产品/分支、账号授权 UI、专用 TLS Engine、安全存储命名空间、
+证据采集与隐私门禁、摇动开关与导航、表单 UI、文案本地化和 ViewModel 生命周期。未配置使用
 `BugReportTarget.Unavailable`。账号密码不落盘；历史保存失败仍保留远端提交成功结果。HTTP 重定向关闭，
 不得把业务客户端或日志输出中的凭据无意带入禅道授权链路。
 
 `BugEvidenceFormatter` 只限长，不脱敏；传入日志和上下文会按现有契约进入 Bug 正文。宿主必须决定用户授权、
 可信目标和脱敏范围；表单状态不暴露自动证据。组件不在公开反馈中接收真实日志或凭据。
-Android Release 是否排除开发工具由宿主依赖配置决定；iOS 是否包含此代码由宿主 Framework 变体决定。
+Android Release 必须由宿主依赖配置排除开发工具；iOS 同一 Framework 包含此代码时，正式环境通过宿主 DI/准入禁用，不创建或启动 detector。
 OpenHarmony 不在本组件范围。
+
+## 原生安全存储与摇动触发（待发布）
+
+以下新增 API 尚未包含在已发布的 0.1.1 中；验证和新版发布完成后才能通过新版固定坐标接入。
+现有 `BugReportStore` 契约保持不变。Android 使用 Keystore AES/GCM 和私有 SharedPreferences，
+iOS 使用 Keychain 和 NSUserDefaults。迁移时传入原标识，不复制 Token 到新空间：
+
+```kotlin
+// Android debug/QA Source Set；Json 沿用宿主配置。
+val store = AndroidBugReportStore(
+    context = context,
+    json = json,
+    preferencesName = "debug_bug_reporting",
+    keyAlias = "debug_zentao_token",
+    tokenKey = "zentao_token",
+    shakeEnabledKey = "shake_enabled",
+    historyKey = "submission_history",
+)
+val shakeDetector = AndroidShakeDetector(context)
+```
+
+```kotlin
+// iOS；默认 NSUserDefaults.standardUserDefaults，也可注入原有 suite。
+val store = IosBugReportStore(
+    json = json,
+    keychainService = "com.dgtang.live.debug.zentao",
+    keychainAccount = "personal-token",
+    preferencesNamespace = "debug_bug_reporting",
+    shakeEnabledKey = "debug_bug_reporting_shake_enabled",
+    historyKey = "debug_bug_reporting_history",
+)
+val shakeDetector = IosShakeDetector()
+```
+
+Android 沿用 Base64（NO_WRAP）的 `12 字节 IV + AES/GCM 密文`，128 位认证标签；alias 不变即可读取旧 Token。
+iOS 沿用 Generic Password 的 service/account 和 UTF-8 数据。历史仍为原 `BugSubmissionRecord` JSON。
+缺少摇动开关时默认开启；缺少或无法解码历史时返回空列表。坏 Android 密文、坏 iOS UTF-8 只清凭据，
+不会清历史、摇动设置或删除 Android Keystore alias。iOS 系统暂时不能读取 Keychain 时返回空 Token，不删除记录。
+
+在宿主现有主线程生命周期中操作 detector，并沿用当前事件收集 scope：
+
+```kotlin
+// 已有生命周期协程中读取 store；availability 和导航仍由宿主维护。
+if (bugReportAvailable && store.readShakeEnabled()) {
+    when (shakeDetector.start()) {
+        ShakeStartResult.STARTED -> Unit
+        ShakeStartResult.SENSOR_UNAVAILABLE -> showSensorUnavailable()
+        ShakeStartResult.REGISTRATION_FAILED -> showSensorRegistrationFailed()
+        ShakeStartResult.CLOSED -> Unit
+    }
+} else {
+    shakeDetector.stop()
+}
+// 已有生命周期收集器：shakeDetector.shakes.collect { openBugReport() }
+// 开关变化：允许且开启则 start()，否则 stop()；宿主仍通过 repository 持久化开关。
+// 生命周期结束：shakeDetector.close()
+```
+
+两端保留 2.7g 阈值、1200ms 冷却；Android 使用 SENSOR_DELAY_UI，iOS 每 0.1s 在主队列接收加速度。
+`start`/`stop`/`close` 幂等，停用不重置冷却，关闭后 `start` 返回 CLOSED。
+事件为无 replay、额外容量 1 的 Flow，不创建协程或常驻任务；没有收集者时事件不会稍后补发。
+剪贴板、分享、重载、品牌状态、表单与导航仍在宿主或各自组件，不由摇动机制接管。
+
+本次本地验证：Android 21 tests 通过；iOS Simulator 22 tests 通过、2 个 Keychain 测试显式跳过；
+Android/Simulator/iOS Arm64 编译通过。Gradle Native 独立 Simulator 测试进程的 SecItemAdd 返回
+`-25291 (errSecNotAvailable)`，所以 Token round-trip 和坏 Token 清理尚未通过真实 Keychain 验收。
+已实跑的 iOS 存储测试覆盖原 NSUserDefaults 键、历史 JSON、默认开关以及 clearCredentials 不修改普通偏好。
+Android Keystore 旧密文/坏密文、Keychain 升级、真实摇动和禁用/销毁注销仍需平台验收，
+未将编译或无传感器环境的结果视为设备验收。具体日志、跳过测试启用步骤见 [开发与验证](docs/开发与验证.md)。
 
 ## 开发与验证
 
