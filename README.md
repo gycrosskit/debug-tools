@@ -12,8 +12,7 @@ Android/iOS 的 Bug 草稿、提交状态、安全 Token 存储、本机历史�
 | 依赖 | lifecycle-viewmodel 2.10.0、coroutines 1.10.2、serialization-json 1.9.0、Ktor 3.3.3 |
 | 产物 | Android Release AAR 与 KMP/iOS KLIB；不单独提供 Swift Package/XCFramework |
 
-固定发布坐标为 `com.github.gycrosskit.debug-tools:debug-tools:0.1.2`。0.1.1 已完成 JitPack 构建、
-独立工程的远程 Android/iOS 三架构编译及 Simulator Framework 链接验收。
+固定发布坐标为 `com.github.gycrosskit.debug-tools:debug-tools:0.1.2`。本版已完成 JitPack 构建、Release 下载 SHA 核验及独立工程真正远程 Android/iOS 三架构编译、Simulator Framework 链接验收。
 0.1.0 保留为首轮发布记录；其根坐标为聚合 POM，sources/metadata 变体存在 URL 改写，消费方使用 0.1.1。
 使用 `maven("https://jitpack.io")` 和以下依赖：
 
@@ -127,11 +126,11 @@ staging 位于 `build/maven/<版本>`，不使用 `mavenLocal`。`verification-c
 在根目录运行：
 
 ```bash
-bash gradlew -p verification-consumer -I <临时脚本> \
+bash gradlew -p verification-consumer -PdebugToolsVersion=0.1.2 \
   compileDebugKotlinAndroid compileKotlinIosArm64 compileKotlinIosX64 linkDebugFrameworkIosSimulatorArm64
 ```
 
-远程发布后移除临时脚本，重新验证 JitPack 下载；本地编译/链接不代表远程发布或设备业务验收。
+该入口默认消费 JitPack 精确版本；本地编译/链接不代表远程发布或设备业务验收。
 
 macOS 本地归档准备使用现有 GY CrossKit 的 Release Maven 归档方案：
 
@@ -139,9 +138,9 @@ macOS 本地归档准备使用现有 GY CrossKit 的 Release Maven 归档方案�
 bash scripts/export-maven.sh
 ```
 
-输出 `build/release/debug-tools-maven-0.1.1.tar.gz` 和 `SHA256SUMS`。`jitpack.yml` 只运行
+输出 `build/release/debug-tools-maven.tar.gz` 和 `SHA256SUMS`。`jitpack.yml` 只运行
 `jitpack-install.sh`，从固定版本 GitHub Release 下载归档并校验仓库内 SHA-256，再安装全部
-Android/iOS Maven 变体；Linux 不现场生成 iOS KLIB。0.1.1 的远程构建、下载、编译和 Simulator 链接均已通过，
+Android/iOS Maven 变体；Linux 不现场生成 iOS KLIB。0.1.2 的远程构建、下载、编译和 Simulator 链接均已通过，
 结果见 [开发与验证](docs/开发与验证.md)。归档前已按组织共用模板移除 JitPack 改写出错误 URL/hash 的 sources 与
 Native metadata 变体并重算校验文件，保留 common metadata、Android AAR 和 iOS KLIB API/runtime 变体；源码仍可从 Git 标签读取。
 
