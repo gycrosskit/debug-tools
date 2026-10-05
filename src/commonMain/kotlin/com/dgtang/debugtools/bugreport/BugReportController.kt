@@ -49,7 +49,8 @@ data class BugReportUiState(
 
 /**
  * 共用提交状态机；方法及 scope 必须属于同一串行 UI/Page Context，实例不自行切线程。
- * 宿主取消页面 scope 释放任务；离页前 flushDraft，停止生产后关闭专用 client/传感器。
+ * 初始恢复期间忽略操作，避免旧快照覆盖新的授权/开关；宿主取消页面 scope 释放任务。
+ * 离页前 flushDraft，停止生产后关闭专用 client/传感器。
  * @param viewModelScope 所属页面的 scope，调用方持有并取消；不可复用到其他页面。
  * @param formatMessage 中性 notice 的资源映射，同 UI Context 调用，默认中文。
  */
@@ -267,6 +268,8 @@ class BugReportController(
                 val notice = (error as? BugReportException)?.notice ?: BugReportNotice(BugReportMessage.OPERATION_FAILED)
                 mutableState.update { it.copy(loading = false, notice = notice, message = formatMessage(notice), isError = true) }
             }
+            // 摇动/深链可以在恢复期间打开表单；只为仍停留在表单的页面补采集一次。
+            if (mutableState.value.section == BugReportSection.FORM) loadEvidence()
         }
     }
 
@@ -295,7 +298,7 @@ class BugReportController(
     }
 
     private fun runOperation(successNotice: BugReportNotice?, operation: suspend () -> Unit) {
-        if (mutableState.value.working) return
+        if (mutableState.value.loading || mutableState.value.working) return
         mutableState.update { it.copy(working = true, message = "", isError = false) }
         viewModelScope.launch {
             try {

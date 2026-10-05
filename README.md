@@ -2,9 +2,7 @@
 
 Android、iOS、HarmonyOS 共用的 Bug 上报组件：草稿、提交状态、安全 Token、本机历史、摇动触发、页面轨迹、证据格式化和禅道 REST 协议。保留 `com.dgtang.debugtools.bugreport` API；表单 UI、品牌、导航和诊断采集由宿主提供。
 
-当前 Maven **0.2.0-rc.2**（`debug-tools` / `debug-tools-kuikly`）：按报告语言生成标题和日志截断提示，补充取消后 UNKNOWN、附件读取失败、成功后 journal 失败及 HUKS 队列回归，完善公共 API 注释。**已发布；JitPack、公开产物校验与干净远程消费通过**。鸿蒙原生继续配套 `@gycrosskit/debug-tools-native@0.2.0-rc.1`；下述 rc.1 远程验收和历史测试数为既有记录。
-
-**已发布版本：`0.2.0-rc.1`（Android/iOS/HarmonyOS）。Maven 已通过真远程消费；OHPM 审核中，鸿蒙原生使用同版 Release HAR 并校验 SHA。**
+候选 Maven **0.2.0-rc.3**（`debug-tools` / `debug-tools-kuikly`）与 HAR **0.2.0-rc.3**：初始恢复期间阻止旧快照覆盖新凭据操作，鸿蒙桥严格拒绝 null 和错误参数类型。新版本发布与远程消费结果见 [完整审查](docs/完整审查.md)；后面的 rc.1/rc.2 为历史验收。
 
 ## 本版对齐范围
 
@@ -114,21 +112,21 @@ classDiagram
 三端使用 JitPack，配套依赖仓库配置见 [独立消费工程](verification-consumer/settings.gradle.kts)：
 
 ```kotlin
-implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.2")
+implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.3")
 ```
 
 三端候选坐标如下（已发布，干净远程消费通过）：
 
 ```kotlin
 commonMain.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.2")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.3")
 }
 ohosArm64Main.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:0.2.0-rc.2")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:0.2.0-rc.3")
 }
 ```
 
-鸿蒙原生配套包为 `@gycrosskit/debug-tools-native@0.2.0-rc.1`。配置、迁移键、手动恢复和生命周期例子见 [接入指南](docs/接入指南.md)；原生注册见 [HAR README](ohos/debug-tools-native/README.md)。
+鸿蒙原生配套包为 `@gycrosskit/debug-tools-native@0.2.0-rc.3`。配置、迁移键、手动恢复和生命周期例子见 [接入指南](docs/接入指南.md)；原生注册见 [HAR README](ohos/debug-tools-native/README.md)。
 
 ## 最小接入
 

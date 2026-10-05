@@ -24,6 +24,10 @@ export class GycDebugToolsModule extends KuiklyRenderBaseModule {
     let args: DebugParams;
     try { args = JSON.parse(typeof params === 'string' ? params : '{}') as DebugParams; }
     catch (_) { callback?.({ status: 'error' }); return null; }
+    if (!args || typeof args.requestId !== 'string' || args.requestId.length === 0 ||
+      args.requestId.length > 128 || (method.startsWith('write') && typeof args.value !== 'string')) {
+      callback?.({ status: 'error' }); return null;
+    }
     if (method === 'cancel') {
       this.pending.delete(args.requestId);
       if (this.shakeRequestId === args.requestId) { this.shakeRequestId = null; this.shake.stop(); }

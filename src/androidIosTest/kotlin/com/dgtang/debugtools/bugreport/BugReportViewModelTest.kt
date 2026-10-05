@@ -29,6 +29,59 @@ import kotlin.test.assertTrue
 @OptIn(ExperimentalCoroutinesApi::class)
 class BugReportViewModelTest {
     @Test
+    fun `initial recovery cannot overwrite a newer credentials operation`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val fixture = BugViewModelFixture()
+        val release = CompletableDeferred<Unit>()
+        fixture.store.readHistory = { release.await(); emptyList() }
+        try {
+            runCurrent()
+            assertTrue(fixture.viewModel.state.value.loading)
+            fixture.viewModel.clearCredentials()
+            runCurrent()
+            assertEquals("test-token", fixture.store.token)
+            assertFalse(fixture.viewModel.state.value.working)
+            release.complete(Unit)
+            fixture.viewModel.state.first { !it.loading }
+            fixture.viewModel.clearCredentials()
+            fixture.viewModel.state.first { !it.working }
+            assertEquals("", fixture.store.token)
+            assertFalse(fixture.viewModel.state.value.tokenConfigured)
+        } finally {
+            release.complete(Unit)
+            fixture.close()
+            Dispatchers.resetMain()
+        }
+    }
+    @Test
+    fun `form opened during initial recovery captures evidence only if still open`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        try {
+            for (keepOpen in listOf(true, false)) {
+                val fixture = BugViewModelFixture()
+                val release = CompletableDeferred<Unit>()
+                fixture.store.readHistory = { release.await(); emptyList() }
+                fixture.evidence = BugEvidenceSnapshot(recentLogs = "recovered-evidence")
+                try {
+                    fixture.viewModel.openForm()
+                    runCurrent()
+                    assertEquals(0, fixture.evidenceCaptures)
+                    if (!keepOpen) fixture.viewModel.closeSection()
+                    release.complete(Unit)
+                    fixture.viewModel.state.first { !it.loading && !it.working }
+                    assertEquals(if (keepOpen) 1 else 0, fixture.evidenceCaptures)
+                    if (keepOpen) {
+                        fixture.viewModel.updateTitle("Recovery form")
+                        fixture.viewModel.submit()
+                        fixture.viewModel.state.first { !it.working && it.submittedUrl.isNotBlank() }
+                        assertTrue(fixture.submittedBody.contains("recovered-evidence"))
+                    }
+                } finally { release.complete(Unit); fixture.close() }
+            }
+        } finally { Dispatchers.resetMain() }
+    }
+
+    @Test
     fun `draft cannot change while submission is pending`() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         val fixture = BugViewModelFixture()
@@ -164,6 +217,7 @@ private class BugViewModelFixture {
     var beforeSubmit: suspend () -> Unit = {}
     var beforeContext: suspend () -> Unit = {}
     var evidence = BugEvidenceSnapshot()
+    var evidenceCaptures = 0
     var submittedBody = ""
     private val http = HttpClient(MockEngine { request ->
         submittedBody = (request.body as OutgoingContent.ByteArrayContent).bytes().decodeToString()
@@ -186,7 +240,10 @@ private class BugViewModelFixture {
         factory = viewModelFactory {
             initializer {
                 BugReportViewModel(repository, object : BugReportHostDataSource {
-                    override suspend fun captureEvidence() = evidence
+                    override suspend fun captureEvidence(): BugEvidenceSnapshot {
+                        evidenceCaptures++
+                        return evidence
+                    }
                     override suspend fun captureContext(): BugReportContext {
                         beforeContext()
                         return BugReportContext("test-brand", BugReportPlatform.ANDROID, "1", "test", "test", 1)
@@ -203,9 +260,10 @@ private class BugViewModelFixture {
 }
 
 private class ViewModelBugStore : BugReportStore {
+    var token = "test-token"
     var historyReads = 0
     var readHistory: suspend () -> List<BugSubmissionRecord> = { emptyList() }
-    override suspend fun readToken() = "test-token"
+    override suspend fun readToken() = token
     override suspend fun writeToken(value: String) = Unit
     override suspend fun readShakeEnabled() = false
     override suspend fun writeShakeEnabled(value: Boolean) = Unit
@@ -214,5 +272,5 @@ private class ViewModelBugStore : BugReportStore {
         return readHistory.invoke()
     }
     override suspend fun writeHistory(value: List<BugSubmissionRecord>) = Unit
-    override suspend fun clearCredentials() = Unit
+    override suspend fun clearCredentials() { token = "" }
 }

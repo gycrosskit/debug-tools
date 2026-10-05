@@ -198,3 +198,23 @@ test('another store with the same alias cannot clear credentials while encryptio
   assert.equal(f.flushes, 2);
   assert.equal(f.sessions.size, 0);
 });
+
+test('native bridge rejects null or mistyped arguments without starting native work', () => {
+  let starts = 0;
+  class Base { onDestroy() {} }
+  class Store { constructor() { starts++; } }
+  class Shake { start() { starts++; } }
+  const Native = load('GycDebugToolsModule', { '@kuikly-open/render': { KuiklyRenderBaseModule: Base },
+    './GycDebugStore': { GycDebugStore: Store }, './GycDebugShakeDetector': { GycDebugShakeDetector: Shake } });
+  const module = new Native();
+  for (const args of ['null', '[]', 'true', '1', '"text"', '{}', '{"requestId":1}', '{"requestId":""}',
+    JSON.stringify({ requestId: 'x'.repeat(129) }), '{"requestId":"write","value":false}']) {
+    const replies = [];
+    assert.doesNotThrow(() => module.call('writeToken', args, reply => replies.push(reply)));
+    assert.equal(replies.length, 1);
+    assert.equal(replies[0].status, 'error');
+  }
+  assert.equal(starts, 0);
+  const f = storeFixture();
+  assert.throws(() => new f.Store({}, { ...f.options, pendingKey: undefined }), /Invalid debug store key/);
+});
