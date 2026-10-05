@@ -8,7 +8,7 @@ kotlin {
     }
     ohosArm64()
     iosArm64()
-    iosX64()
+    iosX64 { binaries.framework { baseName = "DebugToolsConsumer" } }
     iosSimulatorArm64 { binaries.framework { baseName = "DebugToolsConsumer" } }
     sourceSets {
       ohosArm64Main.dependencies {

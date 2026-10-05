@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const crypto = require('node:crypto');
-const ts = require(path.join(process.env.DEVECO_STUDIO_HOME || '/Applications/DevEco-Studio.app/Contents', 'tools/hvigor/hvigor/node_modules/typescript'));
+const ts = require(process.env.TYPESCRIPT_PATH || path.join(process.env.DEVECO_STUDIO_HOME || '/Applications/DevEco-Studio.app/Contents', 'tools/hvigor/hvigor/node_modules/typescript'));
 
 function load(name, dependencies) {
   const source = fs.readFileSync(path.join(__dirname, '../src/main/ets', `${name}.ets`), 'utf8');
