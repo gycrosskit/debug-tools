@@ -13,6 +13,8 @@ import kotlinx.serialization.json.Json
 import platform.CoreFoundation.CFDictionaryCreate
 import platform.CoreFoundation.CFRelease
 import platform.CoreFoundation.CFTypeRef
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSData
 import platform.Foundation.CFBridgingRetain
 import platform.Foundation.NSUserDefaults
@@ -49,6 +51,27 @@ class IosBugReportStoreTest {
             assertFalse(store.readShakeEnabled())
             assertEquals(history, store.readHistory())
         } finally {
+            preferences.removePersistentDomainForName(suite)
+        }
+    }
+
+    @Test
+    fun `workspace survives reopening and credentials clearing using native atomic files`() = runTest {
+        val suite = "debug-tools-workspace-${Random.nextLong()}"
+        val preferences = NSUserDefaults(suiteName = suite)
+        val directory = NSTemporaryDirectory() + suite
+        val store = IosBugReportStore(Json, suite, "test-token", suite, preferences, workspaceDirectory = directory)
+        val draft = BugReportDraft(title = "Persisted fixture")
+        val pending = listOf(PendingBugReport(draft.reportId, "fixture-target", draft, PendingBugStatus.UNKNOWN))
+        try {
+            store.writeDraft(draft)
+            store.writePending(pending)
+            val reopened = IosBugReportStore(Json, suite, "test-token", suite, preferences, workspaceDirectory = directory)
+            reopened.clearCredentials()
+            assertEquals(draft, reopened.readDraft())
+            assertEquals(pending, reopened.readPending())
+        } finally {
+            NSFileManager.defaultManager.removeItemAtPath(directory, null)
             preferences.removePersistentDomainForName(suite)
         }
     }

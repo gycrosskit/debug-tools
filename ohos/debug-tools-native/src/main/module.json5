@@ -1,0 +1,8 @@
+{
+  "module": {
+    "name": "DebugToolsNative",
+    "type": "har",
+    "deviceTypes": ["default", "tablet"],
+    "requestPermissions": [{ "name": "ohos.permission.ACCELEROMETER" }]
+  }
+}

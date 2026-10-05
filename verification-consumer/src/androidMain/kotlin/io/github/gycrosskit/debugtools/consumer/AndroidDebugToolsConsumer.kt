@@ -12,3 +12,8 @@ class AndroidDebugToolsConsumer(context: Context, json: Json, namespace: String,
     val store: BugReportStore = AndroidBugReportStore(context, json, namespace, keyAlias)
     val shakeDetector: ShakeDetector = AndroidShakeDetector(context)
 }
+
+
+fun consumeLegacyViewModel(repository: com.dgtang.debugtools.bugreport.BugReportRepository,
+    host: com.dgtang.debugtools.bugreport.BugReportHostDataSource): androidx.lifecycle.ViewModel =
+    com.dgtang.debugtools.bugreport.BugReportViewModel(repository, host)

@@ -18,6 +18,12 @@ import platform.CoreFoundation.CFRelease
 import platform.CoreFoundation.CFTypeRef
 import platform.CoreFoundation.CFTypeRefVar
 import platform.CoreFoundation.kCFBooleanTrue
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSApplicationSupportDirectory
+import platform.Foundation.NSUserDomainMask
+import platform.Foundation.NSURL
+import platform.Foundation.NSURLIsExcludedFromBackupKey
+import platform.Foundation.writeToFile
 import platform.Foundation.NSData
 import platform.Foundation.CFBridgingRelease
 import platform.Foundation.CFBridgingRetain
@@ -47,7 +53,11 @@ class IosBugReportStore(
     private val preferences: NSUserDefaults = NSUserDefaults.standardUserDefaults,
     private val shakeEnabledKey: String = "${preferencesNamespace}_shake_enabled",
     private val historyKey: String = "${preferencesNamespace}_history",
-) : BugReportStore {
+    private val draftKey: String = "${preferencesNamespace}_draft",
+    private val pendingKey: String = "${preferencesNamespace}_pending",
+    private val workspaceDirectory: String = checkNotNull((NSFileManager.defaultManager.URLsForDirectory(NSApplicationSupportDirectory, NSUserDomainMask).first() as NSURL).path) +
+        "/gycrosskit-debug-tools/" + preferencesNamespace.encodeToByteArray().joinToString("") { it.toUByte().toString(16).padStart(2, '0') },
+) : BugReportStore, BugReportWorkspaceStore {
     override suspend fun readToken(): String = memScoped {
         val result = alloc<CFTypeRefVar>()
         val status = withKeychainQuery(includeResult = true) { SecItemCopyMatching(it, result.ptr) }
@@ -90,6 +100,28 @@ class IosBugReportStore(
     override suspend fun writeHistory(value: List<BugSubmissionRecord>) {
         preferences.setObject(json.encodeToString(value), historyKey)
     }
+
+    override suspend fun readDraft(): BugReportDraft = readWorkspace(draftKey)?.let { json.decodeFromString<BugReportDraft>(it) } ?: BugReportDraft()
+    override suspend fun writeDraft(value: BugReportDraft) = writeWorkspace(draftKey, json.encodeToString(value))
+    override suspend fun readPending(): List<PendingBugReport> = readWorkspace(pendingKey)?.let { json.decodeFromString<List<PendingBugReport>>(it) } ?: emptyList()
+    override suspend fun writePending(value: List<PendingBugReport>) = writeWorkspace(pendingKey, json.encodeToString(value))
+
+    private fun readWorkspace(key: String): String? {
+        val path = "$workspaceDirectory/${fileName(key)}.json"
+        if (!NSFileManager.defaultManager.fileExistsAtPath(path)) return null
+        val data = checkNotNull(NSData.create(contentsOfFile = path)) { "Workspace could not be read" }
+        val bytes = ByteArray(data.length.toInt())
+        if (bytes.isNotEmpty()) bytes.usePinned { memcpy(it.addressOf(0), data.bytes, data.length) }
+        return bytes.decodeToString(throwOnInvalidSequence = true)
+    }
+    private fun writeWorkspace(key: String, text: String) {
+        check(NSFileManager.defaultManager.createDirectoryAtPath(workspaceDirectory, true, null, null))
+        check(NSURL.fileURLWithPath(workspaceDirectory).setResourceValue(true, NSURLIsExcludedFromBackupKey, null))
+        val bytes = text.encodeToByteArray()
+        val data = bytes.usePinned { NSData.create(bytes = it.addressOf(0), length = bytes.size.toULong()) }
+        check(data.writeToFile("$workspaceDirectory/${fileName(key)}.json", atomically = true)) { "Workspace could not be saved" }
+    }
+    private fun fileName(key: String) = key.encodeToByteArray().joinToString("") { it.toUByte().toString(16).padStart(2, '0') }
 
     override suspend fun clearCredentials() {
         withKeychainQuery { SecItemDelete(it) }
