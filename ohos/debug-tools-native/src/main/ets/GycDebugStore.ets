@@ -40,7 +40,7 @@ export class GycDebugStore {
     const keys = [options.namespace, options.keyAlias, options.tokenKey, options.shakeEnabledKey,
       options.historyKey, options.draftKey, options.pendingKey];
     keys.forEach((key: string) => {
-      if (!/^[A-Za-z0-9_.-]{1,128}$/.test(key)) throw new Error('Invalid debug store key');
+      if (typeof key !== 'string' || !/^[A-Za-z0-9_.-]{1,128}$/.test(key)) throw new Error('Invalid debug store key');
     });
     if (new Set(keys.slice(2)).size !== 5) throw new Error('Debug store keys must be distinct');
   }
