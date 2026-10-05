@@ -43,7 +43,21 @@ import platform.Security.kSecReturnData
 import platform.Security.kSecValueData
 import platform.posix.memcpy
 
-/** 沿用宿主 Keychain service/account 和偏好命名空间；Token 不写入 NSUserDefaults。 */
+/**
+ * 宿主串行使用的 iOS Store，所有方法在调用线程同步执行，无后台 scope；宿主后台调用文件/Keychain I/O。
+ * 沿用既有 Keychain identity，Token 不写偏好；系统暂不可访问返回空但不删除，坏 UTF-8 只清凭据。
+ * 草稿/journal 在私有目录原子写入且排除备份，损坏读取报错，不重置 UNKNOWN；不持有长期文件句柄。
+ * @param json 与既有记录兼容的序列化配置。
+ * @param keychainService 原宿主 Keychain service，测试须独立命名空间。
+ * @param keychainAccount 原宿主 Keychain account，勿跨品牌共用。
+ * @param preferencesNamespace 用户开关/历史键及默认工作区目录的隔离名称。
+ * @param preferences 宿主偏好域，不由本组件关闭或清空。
+ * @param shakeEnabledKey 用户开关键，缺失默认开启。
+ * @param historyKey 历史 JSON 键，损坏读取为空。
+ * @param draftKey 草稿文件逻辑键，经 UTF-8 十六进制编码后作文件名。
+ * @param pendingKey journal 文件逻辑键，损坏不得回退为空。
+ * @param workspaceDirectory 专属 Application Support 绝对目录，宿主负责保留/清理记录。
+ */
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 class IosBugReportStore(
     private val json: Json,

@@ -1,5 +1,6 @@
 import { sensor } from '@kit.SensorServiceKit';
 
+/** 所属 ArkTS Context 串行启停；100ms 采样、2.7g 阈值、1200ms 冷却，只释放自己的 sensor 回调。 */
 export class GycDebugShakeDetector {
   private started: boolean = false;
   private closed: boolean = false;
@@ -7,6 +8,7 @@ export class GycDebugShakeDetector {
   private lastTriggerMillis: number = 0;
   private handler: ((data: sensor.AccelerometerResponse) => void) | null = null;
 
+  /** STARTED 为注册成功，onShake 在原生回调 Context 执行；重复 start 不替换回调。 */
   start(onShake: () => void): string {
     if (this.closed) return 'CLOSED';
     if (this.started) return 'STARTED';
@@ -31,6 +33,7 @@ export class GycDebugShakeDetector {
       return 'STARTED';
     } catch (_) { return 'REGISTRATION_FAILED'; }
   }
+  /** 先抑制迟事件再卸载回调；off 失败保留句柄供重试，不重置冷却。 */
   stop(): void {
     this.started = false;
     this.generation++;
@@ -39,5 +42,6 @@ export class GycDebugShakeDetector {
       this.handler = null;
     }
   }
+  /** 永久关闭；off 失败可再次 close 重试，之后 start 仍返回 CLOSED。 */
   close(): void { this.closed = true; this.stop(); }
 }

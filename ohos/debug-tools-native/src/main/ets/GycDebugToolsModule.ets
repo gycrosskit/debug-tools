@@ -5,7 +5,9 @@ import { GycDebugShakeDetector } from './GycDebugShakeDetector';
 interface DebugParams extends GycDebugStoreOptions { requestId: string; value: string; }
 interface DebugResult { status: string; value?: string; }
 
+/** 每个渲染页面独占 Module；ArkTS Context 调用，requestId 拥有回调/存储提交资格，销毁后无回调。 */
 export class GycDebugToolsModule extends KuiklyRenderBaseModule {
+  /** 与 Kotlin Module.NAME 一致的注册名。 */
   static readonly MODULE_NAME: string = 'GycDebugToolsModule';
   private store: GycDebugStore | null = null;
   private readonly shake = new GycDebugShakeDetector();
@@ -13,8 +15,10 @@ export class GycDebugToolsModule extends KuiklyRenderBaseModule {
   private readonly pending: Set<string> = new Set();
   private shakeRequestId: string | null = null;
   private configuration: string = '';
+  /** 使用异步桥调用，不让原生 I/O 阻塞同步渲染返回值。 */
   syncMode(): boolean { return false; }
 
+  /** 解析请求，拒绝重复 id；取消只撤回资格，系统 I/O 未必可撤销；回调不回显异常/凭据。 */
   call(method: string, params: KRAny, callback: KuiklyRenderCallback | null): KRAny {
     if (this.destroyed) return null;
     let args: DebugParams;
@@ -73,6 +77,7 @@ export class GycDebugToolsModule extends KuiklyRenderBaseModule {
     await this.store.write(method, args.value, active);
     return { status: 'ok' };
   }
+  /** 撤回所有待请求资格并关闭所属 sensor，finally 释放基类资源；不删除工作区。 */
   onDestroy(): void {
     this.destroyed = true;
     this.pending.clear();

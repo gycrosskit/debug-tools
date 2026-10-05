@@ -4,24 +4,37 @@ import { huks } from '@kit.UniversalKeystoreKit';
 import { cryptoFramework } from '@kit.CryptoArchitectureKit';
 import { util } from '@kit.ArkTS';
 
+/** 所有字段为 1..128 个 ASCII 字母/数字/_.-，五个数据键须唯一；宿主保持升级隔离域一致。 */
 export interface GycDebugStoreOptions {
+  /** 私有 preferences 域，作为 AES-GCM AAD；不得跨品牌共用。 */
   namespace: string;
+  /** HUKS AES-256 密钥别名，同 alias 的所有实例共享串行队列。 */
   keyAlias: string;
+  /** 只保存密文 JSON 的键。 */
   tokenKey: string;
+  /** 用户开关键，缺失读取 true。 */
   shakeEnabledKey: string;
+  /** 历史 JSON 键，缺失读取 []。 */
   historyKey: string;
+  /** 草稿 JSON 键，缺失读取 {}，损坏不回退为空。 */
   draftKey: string;
+  /** 防重 journal JSON 键，缺失读取 []，损坏必须报错。 */
   pendingKey: string;
 }
 interface EncryptedToken { nonce: string; cipher: string; }
 
-/** 同一 HUKS alias 的生成/读写/清理串行；Token 不落明文，普通记录的写操作等待 flush。 */
+/**
+ * 所属 ArkTS Context 调用，同 HUKS alias 的读写/清理使用共享串行队列；失败不阻塞后续任务。
+ * Token 不落明文，普通记录写入等 flush；系统 I/O 不可取消，active 仅控制排队与提交资格。
+ * 实例不拥有 UIAbilityContext 或传感器；宿主释放页面并撤回 active，不删除授权文件/其他记录。
+ */
 export class GycDebugStore {
   private static queues: Map<string, Promise<void>> = new Map();
   private readonly encoder = new util.TextEncoder();
   private readonly base64 = new util.Base64Helper();
   private readonly context: common.UIAbilityContext;
   private readonly options: GycDebugStoreOptions;
+  /** 校验并持有宿主 Context/配置；不生成密钥，不执行存储或隐私准入。 */
   constructor(context: common.UIAbilityContext, options: GycDebugStoreOptions) {
     this.context = context; this.options = options;
     const keys = [options.namespace, options.keyAlias, options.tokenKey, options.shakeEnabledKey,
@@ -32,6 +45,7 @@ export class GycDebugStore {
     if (new Set(keys.slice(2)).size !== 5) throw new Error('Debug store keys must be distinct');
   }
 
+  /** 解密 Token；缺失为空，临时 HUKS/坏密文报错且保留原凭据，不降级明文；active 控制开始资格。 */
   readToken(active: () => boolean = (): boolean => true): Promise<string> { return this.serial(async (): Promise<string> => {
     const prefs = await this.prefs();
     const stored = await prefs.get(this.options.tokenKey, '');
@@ -46,6 +60,7 @@ export class GycDebugStore {
     return new util.TextDecoder('utf-8', { fatal: true }).decodeWithStream(decrypted);
   }, active); }
 
+  /** token 为 1..16384 UTF-16 字符；随机 12 字节 nonce 加密，活动资格有效才 put/flush。 */
   writeToken(token: string, active: () => boolean = (): boolean => true): Promise<void> { return this.serial(async (): Promise<void> => {
     if (token.length === 0 || token.length > 16384) throw new Error('Invalid token length');
     const generation: huks.HuksOptions = { properties: this.keyProperties() };
@@ -63,6 +78,7 @@ export class GycDebugStore {
     await prefs.flush();
   }, active); }
 
+  /** 仅删密文 Token 并等 flush，保留密钥、历史、草稿、journal；active 失效不发起提交。 */
   clearCredentials(active: () => boolean = (): boolean => true): Promise<void> { return this.serial(async (): Promise<void> => {
     const prefs = await this.prefs();
     this.checkActive(active);
@@ -70,6 +86,7 @@ export class GycDebugStore {
     await prefs.flush();
   }, active); }
 
+  /** 读取已知普通记录方法的原始 JSON/布尔文本；类型错误报告，序列化由 Kotlin 接口解析。 */
   read(method: string, active: () => boolean = (): boolean => true): Promise<string> { return this.serial(async (): Promise<string> => {
     const key = this.key(method);
     const fallback = method === 'readShakeEnabled' ? 'true' : method === 'readDraft' ? '{}' : '[]';
@@ -78,6 +95,7 @@ export class GycDebugStore {
     return result;
   }, active); }
 
+  /** 写已知普通记录，最多 1 Mi UTF-16 字符，先验证 JSON 再等 flush；取消不撤销已开始提交。 */
   write(method: string, value: string, active: () => boolean = (): boolean => true): Promise<void> { return this.serial(async (): Promise<void> => {
     if (value.length > 1048576) throw new Error('Debug record too large');
     const key = this.key(method);

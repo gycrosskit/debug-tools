@@ -21,7 +21,11 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
 
-/** 每页一个 Module；Store/摇动操作使用该页协程，dispose 在同一 Kuikly Context 调用。 */
+/**
+ * 每页一个 Module；所有方法/所属协程都在同一 Kuikly Context，不能从其他 Page 并发访问 callback 表。
+ * 原生请求 20 秒超时，取消撤回回调/未开始写入资格，不保证撤销已经开始的系统 I/O。
+ * Store 实现继承接口契约，Token 不进入普通记录；页面释放前 dispose，原生 onDestroy 再清资源。
+ */
 class DebugToolsModule : Module(), BugReportStore, BugReportWorkspaceStore {
     private class Request(val id: String, val continuation: CancellableContinuation<JSONObject>, val keepAlive: Boolean) {
         var callback: CallbackRef? = null
@@ -35,9 +39,14 @@ class DebugToolsModule : Module(), BugReportStore, BugReportWorkspaceStore {
     private var shakeStarted = false
     private val shakeMutex = Mutex()
     private val mutableShakes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    /** 有界无 replay 的摇动流，沿用宿主页面 scope 收集；停止后迟回调被抑制。 */
     val shakes = mutableShakes.asSharedFlow()
     override fun moduleName() = NAME
 
+    /**
+     * 配置所属原生 Store，所有键须为 1..128 个 ASCII 字母/数字/_.-，5 个数据键必须唯一。
+     * namespace/keyAlias 延续既有隔离域；同一原生实例不允许改为其他配置。
+     */
     suspend fun configure(
         namespace: String, keyAlias: String,
         tokenKey: String = "zentao_token", shakeEnabledKey: String = "shake_enabled",
@@ -77,6 +86,7 @@ class DebugToolsModule : Module(), BugReportStore, BugReportWorkspaceStore {
         if (!shakeStarted) clearShake()
         result
     }
+    /** 同 Context 撤回持续回调并等待原生停止结果，保留冷却；disposed 后静默返回。 */
     suspend fun stopShake() = shakeMutex.withLock {
         if (disposed) return@withLock
         clearShake()
@@ -136,6 +146,7 @@ class DebugToolsModule : Module(), BugReportStore, BugReportWorkspaceStore {
         shakeRequest?.callback = null
         shakeRequest = null
     }
+    /** 同 Context 幂等撤回持续回调、取消待完成请求并通知原生停摇动；此实例不可再使用。 */
     fun dispose() {
         if (disposed) return
         clearShake()
@@ -148,5 +159,8 @@ class DebugToolsModule : Module(), BugReportStore, BugReportWorkspaceStore {
         pending.toList().forEach { it.continuation.cancel() }
         pending.clear()
     }
-    companion object { const val NAME = "GycDebugToolsModule" }
+    companion object {
+        /** 与原生 Module 注册名一致，宿主不能改名仅注册一端。 */
+        const val NAME = "GycDebugToolsModule"
+    }
 }
