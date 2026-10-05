@@ -41,7 +41,7 @@ class BugReportRepositoryTest {
     }
 
     @Test
-    fun `history cancellation still propagates`() = runTest {
+    fun `history cancellation after creation preserves the known bug result`() = runTest {
         val store = MemoryBugReportStore().apply {
             token = "test-token"
             historyReadError = CancellationException("cancelled")
@@ -51,9 +51,9 @@ class BugReportRepositoryTest {
         })
         try {
             val repository = BugReportRepository(ZentaoBugClient(http, TEST_REPOSITORY_TARGET), store)
-            assertFailsWith<CancellationException> {
-                repository.submit(TEST_DRAFT, TEST_CONTEXT, BugEvidenceSnapshot())
-            }
+            val result = repository.submit(TEST_DRAFT, TEST_CONTEXT, BugEvidenceSnapshot())
+            assertEquals(42, result.id)
+            assertFalse(result.historySaved)
         } finally {
             http.close()
         }

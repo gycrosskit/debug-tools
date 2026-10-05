@@ -1,14 +1,19 @@
 package com.dgtang.debugtools.bugreport
 
 import io.ktor.client.HttpClient
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
@@ -26,8 +31,12 @@ import kotlinx.serialization.json.put
 class ZentaoBugClient(
     engineClient: HttpClient,
     private val target: BugReportTarget,
+    private val reportLanguage: BugReportLanguage = BugReportLanguage.CHINESE,
 ) {
     val available: Boolean = target.available
+    val attachmentsAvailable: Boolean = (target as? BugReportTarget.Configured)?.attachmentsEnabled == true
+    internal val destination: String
+        get() = requireTarget().let { "${it.apiBaseUrl}|${it.productId}|${it.branchId}|${it.openedBuild}" }
     private val client = engineClient.config {
         followRedirects = false
         install(ContentNegotiation) {
@@ -38,8 +47,8 @@ class ZentaoBugClient(
     /** 使用账号密码换取 Token；调用方只应持久化返回值，禁止保存账号密码。 */
     suspend fun authorize(account: String, password: String): String {
         val resolvedTarget = requireTarget()
-        require(account.isNotBlank()) { "请输入禅道账号" }
-        require(password.isNotBlank()) { "请输入禅道密码" }
+        if (account.isBlank()) throw BugReportException(BugReportNotice(BugReportMessage.ACCOUNT_REQUIRED))
+        if (password.isBlank()) throw BugReportException(BugReportNotice(BugReportMessage.PASSWORD_REQUIRED))
         val httpResponse = client.post(resolvedTarget.tokenUrl) {
             contentType(ContentType.Application.Json)
             setBody(buildJsonObject {
@@ -47,15 +56,15 @@ class ZentaoBugClient(
                 put("password", password)
             })
         }
-        val response = httpResponse.body<JsonObject>()
+        val response = responseBody(httpResponse, BugReportNotice(BugReportMessage.AUTHORIZATION_FAILED))
         requireSuccess(
             httpStatus = httpResponse.status,
             response = response,
-            notAllowedMessage = "禅道账号授权失败，请检查账号和密码",
+            denied = BugReportNotice(BugReportMessage.AUTHORIZATION_FAILED),
         )
         return response.stringValue("token")
             ?: (response["data"] as? JsonObject)?.stringValue("token")
-            ?: error("禅道授权成功但未返回 Token")
+            ?: throw BugReportException(BugReportNotice(BugReportMessage.TOKEN_MISSING))
     }
 
     suspend fun testConnection(token: String) {
@@ -66,8 +75,8 @@ class ZentaoBugClient(
         }
         requireSuccess(
             httpStatus = httpResponse.status,
-            response = httpResponse.body(),
-            notAllowedMessage = "当前禅道账号无权访问产品 ${resolvedTarget.productId}",
+            response = responseBody(httpResponse, BugReportNotice(BugReportMessage.PRODUCT_DENIED, productId = resolvedTarget.productId)),
+            denied = BugReportNotice(BugReportMessage.PRODUCT_DENIED, productId = resolvedTarget.productId),
         )
     }
 
@@ -79,7 +88,7 @@ class ZentaoBugClient(
     ): BugSubmissionResult {
         val resolvedTarget = requireTarget()
         requireToken(token)
-        require(draft.title.isNotBlank()) { "Bug 标题不能为空" }
+        if (draft.title.isBlank()) throw BugReportException(BugReportNotice(BugReportMessage.TITLE_REQUIRED))
         val httpResponse = client.post("${resolvedTarget.apiBaseUrl}/bugs") {
             header(TOKEN_HEADER, token.trim())
             contentType(ContentType.Application.Json)
@@ -94,53 +103,96 @@ class ZentaoBugClient(
                 put("steps", buildSteps(draft, context, evidence))
             })
         }
-        val response = httpResponse.body<JsonObject>()
+        val response = responseBody(httpResponse, BugReportNotice(BugReportMessage.SUBMIT_DENIED, productId = resolvedTarget.productId, branchId = resolvedTarget.branchId))
         requireSuccess(
             httpStatus = httpResponse.status,
             response = response,
-            notAllowedMessage =
-                "当前禅道账号没有产品 ${resolvedTarget.productId} / 分支 ${resolvedTarget.branchId} 的提 Bug 权限",
+            denied = BugReportNotice(BugReportMessage.SUBMIT_DENIED,
+                productId = resolvedTarget.productId, branchId = resolvedTarget.branchId),
         )
         val bug = response["bug"] as? JsonObject
             ?: response["data"] as? JsonObject
             ?: response
         val id = bug["id"]?.jsonPrimitive?.intOrNull
-            ?: error("禅道返回成功但缺少 Bug ID")
+            ?.takeIf { it > 0 }
+            ?: throw BugReportException(BugReportNotice(BugReportMessage.BUG_ID_MISSING))
         return BugSubmissionResult(
             id = id,
             url = "${resolvedTarget.webBaseUrl}/bug-view-$id.html",
         )
     }
 
+    /** 先创建 Bug 再绑定附件；HTTP 成功缺少正文件 ID 时仍不能确认上传完成。 */
+    suspend fun uploadAttachment(token: String, bugId: Int, attachment: BugReportAttachment, bytes: ByteArray): Int {
+        val resolved = requireTarget()
+        check(attachmentsAvailable) { "Enable attachments only for ZenTao REST v2 22.0+" }
+        requireToken(token)
+        require(bugId > 0 && bytes.size.toLong() == attachment.size)
+        val response = client.post("${resolved.apiBaseUrl}/files") {
+            header(TOKEN_HEADER, token.trim())
+            setBody(MultiPartFormDataContent(formData {
+                append("objectType", "bug")
+                append("objectID", bugId.toString())
+                append("file", bytes, Headers.build {
+                    append(HttpHeaders.ContentType, attachment.contentType)
+                    append(HttpHeaders.ContentDisposition, "filename=\"${attachment.fileName}\"")
+                })
+            }))
+        }
+        val body = responseBody(response, BugReportNotice(BugReportMessage.SUBMIT_DENIED, productId = resolved.productId, branchId = resolved.branchId))
+        requireSuccess(response.status, body,
+            BugReportNotice(BugReportMessage.SUBMIT_DENIED, productId = resolved.productId, branchId = resolved.branchId))
+        return body["id"]?.jsonPrimitive?.intOrNull?.takeIf { it > 0 }
+            ?: error("Attachment response did not return a positive file ID")
+    }
+
+    internal fun existingBug(id: Int): BugSubmissionResult {
+        require(id > 0)
+        return BugSubmissionResult(id, "${requireTarget().webBaseUrl}/bug-view-$id.html")
+    }
+
+    fun close() = client.close()
+
     private fun buildSteps(
         draft: BugReportDraft,
         context: BugReportContext,
         evidence: BugEvidenceSnapshot,
     ): String = buildString {
-        appendLine("【复现步骤】")
-        appendLine(draft.steps.trim().ifBlank { "未填写" })
+        appendLine(label("【复现步骤】", "[Steps]"))
+        appendLine(draft.steps.trim().ifBlank { label("未填写", "Not provided") })
         appendLine("\n【实际结果】")
-        appendLine(draft.actualResult.trim().ifBlank { "未填写" })
+        appendLine(draft.actualResult.trim().ifBlank { label("未填写", "Not provided") })
         appendLine("\n【期望结果】")
-        appendLine(draft.expectedResult.trim().ifBlank { "未填写" })
-        appendLine("\n【自动上下文】")
-        appendLine("品牌：${context.brand}")
-        appendLine("平台：${context.platform.name}")
-        appendLine("影响范围：${draft.scope.name}")
-        appendLine("版本：${context.version}")
-        appendLine("环境：${context.environment}")
-        appendLine("设备：${BugEvidenceFormatter.bound(context.device, 300)}")
-        appendLine("用户 ID：${context.userId.takeIf { it > 0 } ?: "未登录"}")
-        appendLine("\n【页面路径】")
-        appendLine(evidence.pagePaths.joinToString(" -> ").ifBlank { "未采集" })
-        appendLine("\n【最近日志上报】")
-        append(BugEvidenceFormatter.boundRecentLogs(evidence.recentLogs).ifBlank { "未采集" })
+        appendLine(draft.expectedResult.trim().ifBlank { label("未填写", "Not provided") })
+        appendLine(label("\n【自动上下文】", "\n[Context]"))
+        appendLine("${label("品牌", "Brand")}：${context.brand}")
+        appendLine("${label("平台", "Platform")}：${context.platform.name}")
+        appendLine("${label("影响范围", "Scope")}：${draft.scope.name}")
+        appendLine("${label("版本", "Version")}：${context.version}")
+        appendLine("${label("环境", "Environment")}：${context.environment}")
+        appendLine("${label("设备", "Device")}：${BugEvidenceFormatter.bound(context.device, 300)}")
+        appendLine("${label("用户 ID", "User ID")}：${context.userId.takeIf { it > 0 } ?: label("未登录", "Not signed in")}")
+        appendLine(label("\n【页面路径】", "\n[Page trail]"))
+        appendLine(evidence.pagePaths.joinToString(" -> ").ifBlank { label("未采集", "Not captured") })
+        appendLine(label("\n【最近日志上报】", "\n[Recent logs]"))
+        append(BugEvidenceFormatter.boundRecentLogs(evidence.recentLogs).ifBlank { label("未采集", "Not captured") })
     }.take(MAX_STEPS_LENGTH)
+
+    private suspend fun responseBody(response: HttpResponse, denied: BugReportNotice): JsonObject {
+        // 先分类身份/权限，HTML 错误页不能覆盖重新授权语义；5xx/缺 ID 仍是未知写入结果。
+        if (response.status == HttpStatusCode.Unauthorized) {
+            throw BugReportException(if (denied.code == BugReportMessage.AUTHORIZATION_FAILED) denied else BugReportNotice(BugReportMessage.TOKEN_REQUIRED))
+        }
+        if (response.status == HttpStatusCode.Forbidden) throw BugReportException(denied)
+        return response.body()
+    }
+
+    private fun label(chinese: String, english: String) = if (reportLanguage == BugReportLanguage.CHINESE) chinese else english
 
     private fun requireSuccess(
         httpStatus: HttpStatusCode,
         response: JsonObject,
-        notAllowedMessage: String,
+        denied: BugReportNotice,
     ) {
         val status = response["status"]?.jsonPrimitive?.content.orEmpty()
         if (httpStatus.isSuccess() && (status.isBlank() || status.equals("success", ignoreCase = true))) {
@@ -154,17 +206,18 @@ class ZentaoBugClient(
             httpStatus == HttpStatusCode.Forbidden ||
             message.equals("Not allowed", ignoreCase = true)
         ) {
-            error(notAllowedMessage)
+            throw BugReportException(denied)
         }
         error(message)
     }
 
     private fun requireToken(token: String) {
-        require(token.isNotBlank()) { "请先完成禅道账号授权" }
+        if (token.isBlank()) throw BugReportException(BugReportNotice(BugReportMessage.TOKEN_REQUIRED))
     }
 
     private fun requireTarget(): BugReportTarget.Configured =
-        target as? BugReportTarget.Configured ?: error("当前品牌尚未开通禅道 Bug 提交")
+        target as? BugReportTarget.Configured
+            ?: throw BugReportException(BugReportNotice(BugReportMessage.TARGET_UNAVAILABLE))
 
     private companion object {
         const val TOKEN_HEADER = "Token"

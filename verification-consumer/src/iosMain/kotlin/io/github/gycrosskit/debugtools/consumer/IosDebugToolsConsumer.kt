@@ -10,3 +10,8 @@ class IosDebugToolsConsumer(json: Json, service: String, account: String, namesp
     val store: BugReportStore = IosBugReportStore(json, service, account, namespace)
     val shakeDetector: ShakeDetector = IosShakeDetector()
 }
+
+
+fun consumeLegacyViewModel(repository: com.dgtang.debugtools.bugreport.BugReportRepository,
+    host: com.dgtang.debugtools.bugreport.BugReportHostDataSource): androidx.lifecycle.ViewModel =
+    com.dgtang.debugtools.bugreport.BugReportViewModel(repository, host)

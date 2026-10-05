@@ -1,5 +1,7 @@
 package com.dgtang.debugtools.bugreport
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
@@ -21,7 +23,9 @@ class AndroidBugReportStore(
     private val tokenKey: String = "zentao_token",
     private val shakeEnabledKey: String = "shake_enabled",
     private val historyKey: String = "submission_history",
-) : BugReportStore {
+    private val draftKey: String = "bug_draft",
+    private val pendingKey: String = "pending_bugs",
+) : BugReportStore, BugReportWorkspaceStore {
     private val preferences = context.applicationContext.getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
 
     override suspend fun readToken(): String {
@@ -49,6 +53,15 @@ class AndroidBugReportStore(
 
     override suspend fun writeHistory(value: List<BugSubmissionRecord>) {
         preferences.edit().putString(historyKey, json.encodeToString(value)).apply()
+    }
+
+    override suspend fun readDraft(): BugReportDraft = preferences.getString(draftKey, null)?.let { json.decodeFromString<BugReportDraft>(it) } ?: BugReportDraft()
+    override suspend fun writeDraft(value: BugReportDraft) = withContext(Dispatchers.IO) {
+        check(preferences.edit().putString(draftKey, json.encodeToString(value)).commit()) { "Draft could not be saved" }
+    }
+    override suspend fun readPending(): List<PendingBugReport> = preferences.getString(pendingKey, null)?.let { json.decodeFromString<List<PendingBugReport>>(it) } ?: emptyList()
+    override suspend fun writePending(value: List<PendingBugReport>) = withContext(Dispatchers.IO) {
+        check(preferences.edit().putString(pendingKey, json.encodeToString(value)).commit()) { "Pending reports could not be saved" }
     }
 
     override suspend fun clearCredentials() {
