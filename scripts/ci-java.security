@@ -1,0 +1,3 @@
+# 原生冷构建超过十分钟，成功解析覆盖这一轮最多六十分钟的 CI。
+networkaddress.cache.ttl=3600
+networkaddress.cache.negative.ttl=0
