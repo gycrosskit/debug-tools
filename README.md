@@ -2,7 +2,7 @@
 
 Android、iOS、HarmonyOS 共用的 Bug 上报组件：草稿、提交状态、安全 Token、本机历史、摇动触发、页面轨迹、证据格式化和禅道 REST 协议。保留 `com.dgtang.debugtools.bugreport` API；表单 UI、品牌、导航和诊断采集由宿主提供。
 
-**当前远程版本：`0.1.3`（Android/iOS）。新候选：`0.2.0-rc.1`（三端），正在准备发布，渠道可用性以本文验收记录为准。**
+**当前远程预发布版本：`0.2.0-rc.1`（Android/iOS/HarmonyOS）。Maven 已通过真远程消费；OHPM 审核中，鸿蒙原生使用同版 Release HAR 并校验 SHA。**
 
 ## 本版对齐范围
 
@@ -109,13 +109,13 @@ classDiagram
 | 鸿蒙桥 | Kuikly `2.28.0-2.0.21-ohos`，HAR renderer `2.28.0` |
 | 原生产物 | Android AAR、iOS/OHOS KLIB、OHOS HAR；没有独立 Pod/SPM/XCFramework |
 
-已发布版本继续使用 JitPack：
+三端使用 JitPack，配套依赖仓库配置见 [独立消费工程](verification-consumer/settings.gradle.kts)：
 
 ```kotlin
-implementation("com.github.gycrosskit.debug-tools:debug-tools:0.1.3")
+implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.1")
 ```
 
-候选发布后的三端坐标如下；当前只验证本地 staging，不代表这些版本已经远程可下载：
+三端已验证坐标如下：
 
 ```kotlin
 commonMain.dependencies {
@@ -147,7 +147,7 @@ Controller 操作使用宿主 UI/Page 的串行 scope；Store 的 suspend 签名
 
 ## 开发与验证
 
-实际命令、99 项 Kotlin 测试、4 项鸿蒙原生模拟测试、HAR 和产物检查见 [开发与验证](docs/开发与验证.md)。两项 iOS Keychain 测试因 runner 系统服务不可用明确跳过；真实 HUKS/Keystore/Keychain、传感器和禅道写入由使用方验收。
+实际命令、99 项 Kotlin 测试、4 项鸿蒙原生模拟测试、HAR、本地与远程产物检查见 [开发与验证](docs/开发与验证.md)。两项 iOS Keychain 测试因 runner 系统服务不可用明确跳过；真实 HUKS/Keystore/Keychain、传感器和禅道写入由使用方验收。
 
 ```bash
 bash gradlew --no-daemon --max-workers=1 --no-parallel \
@@ -187,3 +187,15 @@ Maven `0.1.3`；没有额外原生源码发布渠道。
 精确 JitPack 0.1.3 新目录消费者：29 tasks / 28s，Android AAR、iOS 三架构编译及 simulator Framework。首次 fresh staging 因 SDK 路径缺省失败，归档入口补 ANDROID_HOME 默认值后定向重跑通过；没有重复整仓验证。
 
 实际日志与 JSON 账单位于 `build/remote-library-review/`。真实设备、业务账号登录/聊天/直播/PiP、权限 UI、真实 Bug/通知发送未执行。
+
+## 0.2.0-rc.1 发布与远程验收
+
+[发布 PR #7](https://github.com/gycrosskit/debug-tools/pull/7) 已合并；不可变 [0.2.0-rc.1 Release](https://github.com/gycrosskit/debug-tools/releases/tag/0.2.0-rc.1) 指向 `c173ef3bb7db01d085382605947e91a4633868f1`。Maven/HAR/清单三个附件重下载字节一致。
+
+JitPack 最终 ok/isTag/public、commit 匹配；九模块 POM/GMM、全部变体文件大小与声明四类 hash、内部依赖和 available-at 身份通过。九个产物的公开 MD5/SHA1 sidecar 通过；SHA256/SHA512 sidecar 返回 404，未将其计为下载验证通过。
+
+全新 Maven 坐标消费者从 JitPack 下载，Android、iOS Arm64/x64/Simulator Framework 和 OHOS 编译通过，28s、13 个任务全部执行；没有 init script、staging、mavenLocal 或源码替换。
+
+OHPM 已提交审核，当前查询 `NOTFOUND`，未上架。鸿蒙使用 [同版 Release HAR](https://github.com/gycrosskit/debug-tools/releases/download/0.2.0-rc.1/debug-tools-native-0.2.0-rc.1.har)，SHA-256：`bedd05d52bed6d1a44fbd58a59748df30845c74ac463e8c06baf08d37a87970b`。Maven 归档 SHA-256：`7dec314543f45f8ef38b9a08b9c47b742d143c5a740d58e0deb7e2bb30e6d951`。
+
+生产宿主已开始接入；构建与接入结果由宿主接入文档记录。真实安全存储、传感器、禅道写入和业务设备验收未执行，不能从本段推断。
