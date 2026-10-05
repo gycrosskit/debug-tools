@@ -2,7 +2,7 @@
 
 Android、iOS、HarmonyOS 共用的 Bug 上报组件：草稿、提交状态、安全 Token、本机历史、摇动触发、页面轨迹、证据格式化和禅道 REST 协议。保留 `com.dgtang.debugtools.bugreport` API；表单 UI、品牌、导航和诊断采集由宿主提供。
 
-候选 Maven **0.2.0-rc.3**（`debug-tools` / `debug-tools-kuikly`）与 HAR **0.2.0-rc.3**：初始恢复期间阻止旧快照覆盖新凭据操作，鸿蒙桥严格拒绝 null 和错误参数类型。新版本发布与远程消费结果见 [完整审查](docs/完整审查.md)；后面的 rc.1/rc.2 为历史验收。
+预发布 Maven **0.2.0-rc.3**（`debug-tools` / `debug-tools-kuikly`）与 Release HAR **0.2.0-rc.3**：初始恢复期间阻止旧快照覆盖新凭据操作，鸿蒙桥严格拒绝 null 和错误参数类型。新标签Release/JitPack文件与新目录Maven实际消费已通过，OHPM仍审核、Release HAR fallback消费已通过，结果见 [完整审查](docs/完整审查.md)；后面的 rc.1/rc.2 为历史验收。
 
 ## 本版对齐范围
 
@@ -115,7 +115,7 @@ classDiagram
 implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.3")
 ```
 
-三端候选坐标如下（已发布，干净远程消费通过）：
+三端固定预发布坐标如下（JitPack 与新版新目录远程消费通过，设备业务另验）：
 
 ```kotlin
 commonMain.dependencies {
@@ -126,7 +126,7 @@ ohosArm64Main.dependencies {
 }
 ```
 
-鸿蒙原生配套包为 `@gycrosskit/debug-tools-native@0.2.0-rc.3`。配置、迁移键、手动恢复和生命周期例子见 [接入指南](docs/接入指南.md)；原生注册见 [HAR README](ohos/debug-tools-native/README.md)。
+鸿蒙原生配套包为 `@gycrosskit/debug-tools-native@0.2.0-rc.3`，OHPM 已提交审核，公开精确版本仍 `NOTFOUND`；`next` 仍指向 rc.1。当前使用 [不可变 Release HAR](https://github.com/gycrosskit/debug-tools/releases/tag/0.2.0-rc.3)，SHA-256 为 `b65c2028968aa8e2b05b1032fbfdae3c66fe6d6834ebc89e72b2297b5c5da532`；不得把审核提交等同于 registry 已安装。配置、迁移键、手动恢复和生命周期例子见 [接入指南](docs/接入指南.md)；原生注册见 [HAR README](ohos/debug-tools-native/README.md)。
 
 ## 最小接入
 
@@ -170,7 +170,7 @@ staging 位于 `build/maven/<版本>`，不用 mavenLocal。`verification-consum
 本轮 Android 22 项与 Simulator 23 项实际测试通过，另 2 项 Keychain 测试仍明确跳过；iOS arm64 编译通过。
 证据冻结回归用真实 ViewModel/MockEngine 先红后绿，没有发送真实 Bug 请求。
 
-| 当前候选渠道 | 配套版本 |
+| 该版本配套渠道 | 配套版本 |
 | --- | --- |
 | Maven | `0.1.3` |
 
