@@ -2,7 +2,7 @@
 
 Android、iOS、HarmonyOS 共用的 Bug 上报组件：草稿、提交状态、安全 Token、本机历史、摇动触发、页面轨迹、证据格式化和禅道 REST 协议。保留 `com.dgtang.debugtools.bugreport` API；表单 UI、品牌、导航和诊断采集由宿主提供。
 
-当前 Maven 候选 **0.2.0-rc.2**（`debug-tools` / `debug-tools-kuikly`）：按报告语言生成标题和日志截断提示，补充取消后 UNKNOWN、附件读取失败、成功后 journal 失败及 HUKS 队列回归，完善公共 API 注释。**发布准备中，完成远程验收后更新**。鸿蒙原生继续配套 `@gycrosskit/debug-tools-native@0.2.0-rc.1`；下述 rc.1 远程验收和历史测试数不代表新候选结果。
+当前 Maven **0.2.0-rc.2**（`debug-tools` / `debug-tools-kuikly`）：按报告语言生成标题和日志截断提示，补充取消后 UNKNOWN、附件读取失败、成功后 journal 失败及 HUKS 队列回归，完善公共 API 注释。**已发布；JitPack、公开产物校验与干净远程消费通过**。鸿蒙原生继续配套 `@gycrosskit/debug-tools-native@0.2.0-rc.1`；下述 rc.1 远程验收和历史测试数为既有记录。
 
 **已发布版本：`0.2.0-rc.1`（Android/iOS/HarmonyOS）。Maven 已通过真远程消费；OHPM 审核中，鸿蒙原生使用同版 Release HAR 并校验 SHA。**
 
@@ -117,7 +117,7 @@ classDiagram
 implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.2")
 ```
 
-三端候选坐标如下（发布准备中，完成远程验收后更新）：
+三端候选坐标如下（已发布，干净远程消费通过）：
 
 ```kotlin
 commonMain.dependencies {
@@ -201,3 +201,11 @@ JitPack 最终 ok/isTag/public、commit 匹配；九模块 POM/GMM、全部变�
 OHPM 已提交审核，当前查询 `NOTFOUND`，未上架。鸿蒙使用 [同版 Release HAR](https://github.com/gycrosskit/debug-tools/releases/download/0.2.0-rc.1/debug-tools-native-0.2.0-rc.1.har)，SHA-256：`bedd05d52bed6d1a44fbd58a59748df30845c74ac463e8c06baf08d37a87970b`。Maven 归档 SHA-256：`7dec314543f45f8ef38b9a08b9c47b742d143c5a740d58e0deb7e2bb30e6d951`。
 
 生产宿主已开始接入；构建与接入结果由宿主接入文档记录。真实安全存储、传感器、禅道写入和业务设备验收未执行，不能从本段推断。
+
+## 0.2.0-rc.2 本轮测试与远程验收
+
+2026-10-05：本轮自有源码和公开 API 审查、关键回归与受影响平台编译通过；真实 JitPack `0.2.0-rc.2` 的最终标签提交、9 个 publications 的 POM/Module、所有变体文件大小与四种声明哈希、内部精确版本及 available-at 均通过。Release Maven 归档重新下载 SHA-256 为 `cd45b6f66ce2bb7bb955c541cd56d65a04e05dabc4d25cddd1ee100672bf87dd`。公开 MD5/SHA-1 sidecar 通过；SHA-256/SHA-512 sidecar 的 HTTP 404 记录为渠道缺失。
+
+干净消费工程使用固定远程版本，没有本地 Maven、includeBuild 或其他组件源码替代；通过现有入口的 Android/iOS / OHOS 编译和相应最终链接。
+
+完整回归范围、精简原则、注释契约与仍需设备/业务验收的边界见 [14 个功能组件测试与 API 审查](https://github.com/gycrosskit/.github/blob/main/docs/组件测试与API审查.md)。源码测试与远程消费不代替真机和厂商业务验收。
