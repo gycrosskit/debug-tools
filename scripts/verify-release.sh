@@ -23,3 +23,14 @@ with tarfile.open(sys.argv[1]) as archive:
 PYTHON
 python3 scripts/check-maven.py "$output/maven" com.github.gycrosskit.debug-tools "$VERSION" debug-tools,debug-tools-kuikly ios_arm64,ios_x64,ios_simulator_arm64,ohos_arm64
 # 消费方只使用 JitPack；归档校验不会安装到 MavenLocal 或替代远程解析。
+
+# 预期 inventory 来自通过冻结 SHA 的归档，不从 JitPack 自报 inventory 反推。
+publications="$(python3 - "$output/maven" <<'PYTHON'
+import sys
+from pathlib import Path
+print(','.join(sorted(path.parent.parent.name for path in Path(sys.argv[1]).rglob('*.module'))))
+PYTHON
+)"
+tag_refs="$(git ls-remote --tags https://github.com/gycrosskit/debug-tools.git "refs/tags/$VERSION" "refs/tags/$VERSION^{}")"
+commit="$(printf '%s\n' "$tag_refs" | awk '$2 ~ /\^\{\}$/ {peeled=$1} {plain=$1} END {print peeled ? peeled : plain}')"
+python3 scripts/check-public-maven.py --repo debug-tools --version "$VERSION" --commit "$commit" --expected-publications "$publications" --output-dir "$output/public"
