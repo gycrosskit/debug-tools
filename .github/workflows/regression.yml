@@ -9,6 +9,8 @@ permissions:
 concurrency:
   group: regression-${{ github.ref }}
   cancel-in-progress: true
+env:
+  JAVA_TOOL_OPTIONS: -Djava.security.properties=${{ github.workspace }}/scripts/ci-java.security
 jobs:
   contracts:
     runs-on: ubuntu-24.04
@@ -34,7 +36,8 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - run: bash gradlew --init-script "$PWD/scripts/ci-repositories.gradle" jvmTest testDebugUnitTest compileReleaseKotlinAndroid --no-daemon --max-workers=1 --stacktrace
+          cache: gradle
+      - run: bash gradlew --init-script "$PWD/scripts/ci-repositories.gradle" jvmTest testDebugUnitTest compileReleaseKotlinAndroid --no-daemon --max-workers=1 --stacktrace --info
   native:
     runs-on: macos-15
     timeout-minutes: 60
@@ -46,8 +49,9 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+          cache: gradle
       - run: |
           ios_test_target=iosSimulatorArm64Test
           if [[ "$(uname -m)" != arm64 ]]; then ios_test_target=iosX64Test; fi
-          bash gradlew --init-script "$PWD/scripts/ci-repositories.gradle" "$ios_test_target" compileKotlinIosArm64 compileKotlinIosX64 compileKotlinOhosArm64 :debug-tools-kuikly:compileKotlinOhosArm64 --no-daemon --max-workers=1 --stacktrace
+          bash gradlew --init-script "$PWD/scripts/ci-repositories.gradle" "$ios_test_target" compileKotlinIosArm64 compileKotlinIosX64 compileKotlinOhosArm64 :debug-tools-kuikly:compileKotlinOhosArm64 --no-daemon --max-workers=1 --stacktrace --info
           python3 -c 'import pathlib, sys, xml.etree.ElementTree as ET; files=pathlib.Path(".").glob("**/build/test-results/"+sys.argv[1]+"/*.xml"); cases=[case for path in files for case in ET.parse(path).iter("testcase")]; assert any(case.find("skipped") is None for case in cases), "No executed iOS test cases"' "$ios_test_target"
