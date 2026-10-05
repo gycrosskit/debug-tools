@@ -16,6 +16,33 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ZentaoBugClientTest {
+    @Test fun `English report request localizes every section while preserving user text`() = runTest {
+        var steps = ""
+        val http = HttpClient(MockEngine { request ->
+            val body = (request.body as OutgoingContent.ByteArrayContent).bytes().decodeToString()
+            val payload = kotlinx.serialization.json.Json.parseToJsonElement(body) as kotlinx.serialization.json.JsonObject
+            steps = (payload["steps"] as kotlinx.serialization.json.JsonPrimitive).content
+            respond("""{"id":42}""", HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, "application/json"))
+        })
+        val client = ZentaoBugClient(http, TEST_TARGET, BugReportLanguage.ENGLISH)
+        val originalMarker = "Authorization: Bearer sensitive-original-marker"
+        val logs = listOf("a".repeat(4000), "b".repeat(4000), "c".repeat(4000),
+            "d".repeat(4000 - originalMarker.length) + originalMarker).joinToString("\n")
+        try {
+            client.submit("token", BugReportDraft(title = "English report", actualResult = "实际输入", expectedResult = "期望输入"),
+                BugReportContext("test", BugReportPlatform.OHOS, "1", "test", "device", 0), BugEvidenceSnapshot(recentLogs = logs))
+            for (section in listOf("Steps", "Actual result", "Expected result", "Context", "Page trail", "Recent logs")) {
+                assertTrue("[$section]" in steps, section)
+            }
+            assertFalse("【" in steps)
+            assertTrue("实际输入" in steps && "期望输入" in steps)
+            val submittedLogs = steps.substringAfter("[Recent logs]\n")
+            assertTrue(submittedLogs.startsWith("… Earlier logs omitted\n"))
+            assertFalse("已省略更早日志" in steps)
+            assertTrue(submittedLogs.length <= 12_000)
+            assertTrue(submittedLogs.endsWith(originalMarker))
+        } finally { client.close(); http.close() }
+    }
     @Test
     fun `submits fixed product branch and complete automatic evidence`() = runTest {
         var captured: HttpRequestData? = null

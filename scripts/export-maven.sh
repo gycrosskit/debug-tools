@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
-version="${VERSION:-0.2.0-rc.1}"
+version="${VERSION:-0.2.0-rc.2}"
 export ANDROID_HOME="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
 rm -rf "build/maven/$version"
 GROUP=com.github.gycrosskit.debug-tools VERSION="$version" bash gradlew --no-daemon --max-workers=1 -Dorg.gradle.parallel=false publishAllPublicationsToStagingRepository

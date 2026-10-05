@@ -10,6 +10,7 @@ import platform.Foundation.NSOperationQueue
 import platform.Foundation.timeIntervalSince1970
 import kotlin.math.sqrt
 
+/** Main 线程启停并接收 CoreMotion；100ms 采样、2.7g 阈值、1200ms 冷却，close 释放注册。 */
 @OptIn(ExperimentalForeignApi::class)
 class IosShakeDetector : ShakeDetector {
     private val motionManager = CMMotionManager()

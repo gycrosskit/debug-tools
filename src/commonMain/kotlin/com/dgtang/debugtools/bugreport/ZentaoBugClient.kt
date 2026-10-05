@@ -27,13 +27,20 @@ import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
-/** 禅道 REST 协议实现；TLS 策略由专用平台 Engine 提供，禁止复用业务 HttpClient。 */
+/**
+ * 禅道 REST 协议实现，取消向调用方传播；只响应显式方法调用，不自动重试。
+ * TLS/超时策略由宿主专用 Engine 提供，禁止复用业务 HttpClient；拒绝重定向。
+ * 本实例拥有配置后的 client，宿主停止任务后 close，并负责原 engineClient 的生命周期。
+ * 诊断正文保留原文，可能含凭据/个人信息，授权与脱敏由宿主负责。
+ */
 class ZentaoBugClient(
     engineClient: HttpClient,
     private val target: BugReportTarget,
     private val reportLanguage: BugReportLanguage = BugReportLanguage.CHINESE,
 ) {
+    /** 静态目标是否存在，不表示权限有效。 */
     val available: Boolean = target.available
+    /** 宿主是否核验并开启 REST v2 文件能力。 */
     val attachmentsAvailable: Boolean = (target as? BugReportTarget.Configured)?.attachmentsEnabled == true
     internal val destination: String
         get() = requireTarget().let { "${it.apiBaseUrl}|${it.productId}|${it.branchId}|${it.openedBuild}" }
@@ -67,6 +74,7 @@ class ZentaoBugClient(
             ?: throw BugReportException(BugReportNotice(BugReportMessage.TOKEN_MISSING))
     }
 
+    /** GET 核验产品权限，Token 不得为空白；不创建 Bug 或保存 Token。 */
     suspend fun testConnection(token: String) {
         val resolvedTarget = requireTarget()
         requireToken(token)
@@ -80,6 +88,7 @@ class ZentaoBugClient(
         )
     }
 
+    /** 单次 POST 创建 Bug，标题不得为空白；HTTP 成功缺正 ID 仍为未知结果，Repository 负责防重。 */
     suspend fun submit(
         token: String,
         draft: BugReportDraft,
@@ -151,6 +160,7 @@ class ZentaoBugClient(
         return BugSubmissionResult(id, "${requireTarget().webBaseUrl}/bug-view-$id.html")
     }
 
+    /** 关闭本实例配置后的请求 client；宿主先取消/等待正在进行的任务并另行释放原 Engine。 */
     fun close() = client.close()
 
     private fun buildSteps(
@@ -160,9 +170,9 @@ class ZentaoBugClient(
     ): String = buildString {
         appendLine(label("【复现步骤】", "[Steps]"))
         appendLine(draft.steps.trim().ifBlank { label("未填写", "Not provided") })
-        appendLine("\n【实际结果】")
+        appendLine(label("\n【实际结果】", "\n[Actual result]"))
         appendLine(draft.actualResult.trim().ifBlank { label("未填写", "Not provided") })
-        appendLine("\n【期望结果】")
+        appendLine(label("\n【期望结果】", "\n[Expected result]"))
         appendLine(draft.expectedResult.trim().ifBlank { label("未填写", "Not provided") })
         appendLine(label("\n【自动上下文】", "\n[Context]"))
         appendLine("${label("品牌", "Brand")}：${context.brand}")
@@ -175,7 +185,7 @@ class ZentaoBugClient(
         appendLine(label("\n【页面路径】", "\n[Page trail]"))
         appendLine(evidence.pagePaths.joinToString(" -> ").ifBlank { label("未采集", "Not captured") })
         appendLine(label("\n【最近日志上报】", "\n[Recent logs]"))
-        append(BugEvidenceFormatter.boundRecentLogs(evidence.recentLogs).ifBlank { label("未采集", "Not captured") })
+        append(BugEvidenceFormatter.boundRecentLogs(evidence.recentLogs, reportLanguage).ifBlank { label("未采集", "Not captured") })
     }.take(MAX_STEPS_LENGTH)
 
     private suspend fun responseBody(response: HttpResponse, denied: BugReportNotice): JsonObject {

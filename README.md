@@ -2,11 +2,13 @@
 
 Android、iOS、HarmonyOS 共用的 Bug 上报组件：草稿、提交状态、安全 Token、本机历史、摇动触发、页面轨迹、证据格式化和禅道 REST 协议。保留 `com.dgtang.debugtools.bugreport` API；表单 UI、品牌、导航和诊断采集由宿主提供。
 
-**当前远程预发布版本：`0.2.0-rc.1`（Android/iOS/HarmonyOS）。Maven 已通过真远程消费；OHPM 审核中，鸿蒙原生使用同版 Release HAR 并校验 SHA。**
+当前 Maven 候选 **0.2.0-rc.2**（`debug-tools` / `debug-tools-kuikly`）：按报告语言生成标题和日志截断提示，补充取消后 UNKNOWN、附件读取失败、成功后 journal 失败及 HUKS 队列回归，完善公共 API 注释。**发布准备中，完成远程验收后更新**。鸿蒙原生继续配套 `@gycrosskit/debug-tools-native@0.2.0-rc.1`；下述 rc.1 远程验收和历史测试数不代表新候选结果。
+
+**已发布版本：`0.2.0-rc.1`（Android/iOS/HarmonyOS）。Maven 已通过真远程消费；OHPM 审核中，鸿蒙原生使用同版 Release HAR 并校验 SHA。**
 
 ## 本版对齐范围
 
-| 能力 | 0.2.0-rc.1 候选 |
+| 能力 | 当前候选范围 |
 | --- | --- |
 | 鸿蒙 Bug 上报 | 共用 Controller/Repository/REST，OHOS KLIB + Kuikly 薄桥 |
 | 鸿蒙 Token 存储 | HUKS AES-256-GCM，随机 nonce，普通偏好只保存密文 |
@@ -100,7 +102,7 @@ classDiagram
 
 ## 支持与安装
 
-| 项目 | 0.2.0-rc.1 候选范围 |
+| 项目 | 当前候选范围 |
 | --- | --- |
 | 平台 | Android minSdk 24、iOS Arm64/Simulator Arm64/x64、OHOS Arm64；JVM 用于共用核心消费和测试 |
 | 工具链 | Kotlin `2.2.21-1.0.0`、AGP 8.10.1、Gradle 8.11.1、JVM 11；Gradle JDK 17+ |
@@ -112,17 +114,17 @@ classDiagram
 三端使用 JitPack，配套依赖仓库配置见 [独立消费工程](verification-consumer/settings.gradle.kts)：
 
 ```kotlin
-implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.1")
+implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.2")
 ```
 
-三端已验证坐标如下：
+三端候选坐标如下（发布准备中，完成远程验收后更新）：
 
 ```kotlin
 commonMain.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.1")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.2")
 }
 ohosArm64Main.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:0.2.0-rc.1")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:0.2.0-rc.2")
 }
 ```
 

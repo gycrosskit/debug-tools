@@ -158,3 +158,43 @@ test('native module destruction revokes pending store owner and shake delivery',
   assert.equal(handlers.size, 0);
   assert.equal(f.values.size, 0);
 });
+
+
+test('HUKS failure aborts its session, preserves existing ciphertext and does not poison the alias queue', async () => {
+  const f = storeFixture();
+  await f.store.writeToken('original-token');
+  const original = f.values.get('token'), flushes = f.flushes;
+  f.beforeFinish = async () => { throw Error('temporary HUKS failure'); };
+  await assert.rejects(f.store.writeToken('replacement'), /HUKS failure/);
+  assert.equal(f.sessions.size, 0);
+  assert.equal(f.values.get('token'), original);
+  assert.equal(f.flushes, flushes);
+  await assert.rejects(f.store.readToken(), /HUKS failure/);
+  assert.equal(f.sessions.size, 0);
+  assert.equal(f.values.get('token'), original);
+  f.beforeFinish = async () => {};
+  assert.equal(await f.store.readToken(), 'original-token');
+  await f.store.writeToken('recovered-token');
+  assert.equal(await f.store.readToken(), 'recovered-token');
+});
+
+test('another store with the same alias cannot clear credentials while encryption is pending', async () => {
+  const f = storeFixture();
+  const second = new f.Store({}, f.options);
+  let release, entered;
+  const start = new Promise(resolve => { entered = resolve; });
+  f.beforeFinish = async () => { entered(); await new Promise(resolve => { release = resolve; }); };
+  const writing = f.store.writeToken('pending-token');
+  await start;
+  let cleared = false;
+  const clearing = second.clearCredentials().then(() => { cleared = true; });
+  await Promise.resolve();
+  assert.equal(cleared, false);
+  assert.equal(f.flushes, 0);
+  release();
+  await writing;
+  await clearing;
+  assert.equal(f.values.has('token'), false);
+  assert.equal(f.flushes, 2);
+  assert.equal(f.sessions.size, 0);
+});

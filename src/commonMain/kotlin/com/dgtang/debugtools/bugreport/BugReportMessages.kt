@@ -1,5 +1,6 @@
 package com.dgtang.debugtools.bugreport
 
+/** 不含服务端原文的状态码；宿主可以用自己的本地化资源映射。 */
 enum class BugReportMessage {
     TARGET_UNAVAILABLE, TITLE_REQUIRED, ACCOUNT_REQUIRED, PASSWORD_REQUIRED, TOKEN_REQUIRED,
     AUTHORIZED, AUTHORIZATION_FAILED, PRODUCT_DENIED, SUBMIT_DENIED, CONNECTION_OK,
@@ -9,7 +10,14 @@ enum class BugReportMessage {
     OPERATION_FAILED,
 }
 
+/**
+ * @property code 可本地化状态码。
+ * @property bugId 已创建 ID，未关联为 0。
+ * @property productId 权限失败对应产品 ID，未关联为 0。
+ * @property branchId 权限失败对应分支 ID，未关联为 0。
+ */
 data class BugReportNotice(val code: BugReportMessage, val bugId: Int = 0, val productId: Int = 0, val branchId: Int = 0)
+/** 默认状态文案与自动报告标签的语言；不翻译用户输入或原始日志。 */
 enum class BugReportLanguage { CHINESE, ENGLISH }
 
 /** 宿主可注入自己的资源映射；兼容默认中文，同时提供英文，无需 UI 依赖。 */
@@ -74,5 +82,10 @@ fun BugReportNotice.text(language: BugReportLanguage = BugReportLanguage.CHINESE
     }
 }
 
+/**
+ * 带中性状态的操作异常；宿主不得原样公开可能含凭据的 cause。
+ * @property notice 可本地化的失败原因，不含远端正文。
+ * @param cause 原始诊断异常，可能含签名 URL/敏感上下文。
+ */
 class BugReportException(val notice: BugReportNotice, cause: Throwable? = null) :
     IllegalStateException(notice.text(), cause)

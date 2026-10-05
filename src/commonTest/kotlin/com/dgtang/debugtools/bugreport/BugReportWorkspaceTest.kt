@@ -14,6 +14,45 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
 class BugReportWorkspaceTest {
+    @Test fun `cancelled create response remains unknown and cannot be retried implicitly`() = runTest {
+        WorkspaceFixture().use { fixture ->
+            val entered = CompletableDeferred<Unit>()
+            fixture.beforeBug = { entered.complete(Unit); CompletableDeferred<Unit>().await() }
+            val submitting = launch { fixture.repository.submit(DRAFT, CONTEXT, BugEvidenceSnapshot()) }
+            entered.await()
+            submitting.cancel(); submitting.join()
+            assertEquals(PendingBugStatus.UNKNOWN, fixture.repository.pending().single().status)
+            val error = assertFailsWith<BugReportException> { fixture.repository.submit(DRAFT, CONTEXT, BugEvidenceSnapshot()) }
+            assertEquals(BugReportMessage.UNKNOWN_RESULT, error.notice.code)
+            assertEquals(1, fixture.bugRequests)
+        }
+    }
+
+    @Test fun `unreadable attachment preserves created bug without claiming an upload was sent`() = runTest {
+        WorkspaceFixture(loadAttachment = { error("local file unavailable") }).use { fixture ->
+            val result = fixture.repository.submit(DRAFT.copy(attachments = listOf(FILE_A)), CONTEXT, BugEvidenceSnapshot())
+            assertEquals(42, result.id)
+            assertEquals(listOf(FILE_A), result.failedAttachments)
+            val entry = fixture.repository.pending().single()
+            assertEquals(PendingBugStatus.CREATED, entry.status)
+            assertTrue(entry.uncertainAttachments.isEmpty())
+            assertEquals(0, fixture.fileRequests)
+            assertEquals(1, fixture.bugRequests)
+        }
+    }
+
+    @Test fun `known creation survives failed acknowledgement journal without duplicate network write`() = runTest {
+        WorkspaceFixture().use { fixture ->
+            fixture.beforeBug = { fixture.store.failPending = true }
+            val result = fixture.repository.submit(DRAFT, CONTEXT, BugEvidenceSnapshot())
+            assertEquals(42, result.id)
+            assertFalse(result.workspaceSaved)
+            assertEquals(PendingBugStatus.UNKNOWN, fixture.store.entries.single().status)
+            assertEquals(42, fixture.store.history.single().id)
+            assertFailsWith<BugReportException> { fixture.repository.submit(DRAFT, CONTEXT, BugEvidenceSnapshot()) }
+            assertEquals(1, fixture.bugRequests)
+        }
+    }
     @Test fun `draft and pending survive reauthorization without sending a report`() = runTest {
         val store = WorkspaceStore()
         WorkspaceFixture(store).use { first ->
@@ -232,10 +271,13 @@ private class WorkspaceStore : BugReportStore, BugReportWorkspaceStore {
     override suspend fun writePending(value: List<PendingBugReport>) { check(!failPending); entries = value }
 }
 
-private class WorkspaceFixture(val store: WorkspaceStore = WorkspaceStore(), product: Int = 1) : AutoCloseable {
+private class WorkspaceFixture(val store: WorkspaceStore = WorkspaceStore(), product: Int = 1,
+    loadAttachment: suspend (BugReportAttachment) -> ByteArray = { "abc".encodeToByteArray() },
+) : AutoCloseable {
     var bugRequests = 0
     var fileRequests = 0
     var loseCreateResponse = false
+    var beforeBug: suspend () -> Unit = {}
     var rejectAuthorization = false
     var rejectFileAuthorization = false
     var loseFileResponse = 0
@@ -255,6 +297,7 @@ private class WorkspaceFixture(val store: WorkspaceStore = WorkspaceStore(), pro
             }
             else -> {
                 bugRequests++
+                beforeBug()
                 if (loseCreateResponse) error("Creation acknowledgement lost")
                 if (rejectAuthorization) { status = HttpStatusCode.Unauthorized; "<html>Unauthorized</html>" }
                 else """{"id":42}"""
@@ -264,6 +307,6 @@ private class WorkspaceFixture(val store: WorkspaceStore = WorkspaceStore(), pro
     })
     private val client = ZentaoBugClient(http,
         BugReportTarget.Configured("https://example.test/tokens", "https://example.test/api/v2", "https://example.test", product, 1, "trunk", true))
-    val repository = BugReportRepository(client, store, loadAttachment = { "abc".encodeToByteArray() })
+    val repository = BugReportRepository(client, store, loadAttachment = loadAttachment)
     override fun close() { client.close(); http.close() }
 }

@@ -8,7 +8,13 @@ import kotlinx.coroutines.sync.withLock
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-/** 提交、授权设置和本机历史的统一入口；账号密码不持久化，平台 Store 只安全保存 Token。 */
+/**
+ * 提交、授权设置和本机历史入口，工作区操作使用实例 Mutex；账号密码不持久化。
+ * 宿主串行调用授权/设置/历史操作，并遵守平台 Store 的线程约束；实例不拥有 client 或附件原件。
+ * 取消传播，但远端已成功后的 journal/历史确认使用 NonCancellable，避免重复 POST。
+ * @param nowMillis 确认时的 Unix 毫秒时钟。
+ * @param loadAttachment 宿主授权读取器，返回完整内容；必须自行释放文件句柄，不读取未授权 id。
+ */
 class BugReportRepository(
     private val client: ZentaoBugClient,
     private val store: BugReportStore,
@@ -18,28 +24,36 @@ class BugReportRepository(
 ) {
     private val workspace = store as? BugReportWorkspaceStore
     private val workspaceMutex = Mutex()
+    /** Store 是否真正实现确认落盘的工作区契约。 */
     val draftsAvailable: Boolean get() = workspace != null
+    /** 目标、工作区与宿主读取器均支持附件，不证明当前文件权限可用。 */
     val attachmentsAvailable: Boolean get() = client.attachmentsAvailable && loadAttachment != null && workspace != null
+    /** 是否配置静态目标，不代表服务端可达/权限有效。 */
     val available: Boolean
         get() = client.available
 
+    /** 读取 Token 是否存在和用户开关，不发网络，不在结果暴露 Token。 */
     suspend fun settings(): BugReportSettings = BugReportSettings(
         tokenConfigured = store.readToken().isNotBlank(),
         shakeEnabled = store.readShakeEnabled(),
     )
 
+    /** 只有 Token 交换及产品权限均成功才替换安全 Token；失败/取消不持久化账号密码。 */
     suspend fun authorize(account: String, password: String) {
         val token = client.authorize(account, password)
         client.testConnection(token)
         store.writeToken(token)
     }
 
+    /** 保存用户开关，不负责传感器启停。 */
     suspend fun setShakeEnabled(enabled: Boolean) = store.writeShakeEnabled(enabled)
 
+    /** 读取 Token 并核验目标产品权限，失败以中性 notice 报告。 */
     suspend fun testConnection() {
         client.testConnection(store.readToken())
     }
 
+    /** 验证草稿，支持工作区时先落盘防重 journal 再创建；无工作区仅保持旧无附件路径。 */
     suspend fun submit(
         draft: BugReportDraft,
         context: BugReportContext,
@@ -68,11 +82,14 @@ class BugReportRepository(
             result.copy(historySaved = false, reportId = draft.reportId)
         } }
 
+    /** 读取恢复草稿；不支持工作区时返回新草稿，损坏状态向调用方报告。 */
     suspend fun draft(): BugReportDraft = workspaceMutex.withLock { workspace?.readDraft() ?: BugReportDraft() }
+    /** 验证限长/附件能力后确认草稿落盘，可保存空标题；无工作区报告失败。 */
     suspend fun saveDraft(draft: BugReportDraft) = workspaceMutex.withLock {
         validateDraft(draft)
         requireWorkspace().writeDraft(draft)
     }
+    /** 返回队列快照；includeCompleted=false 隐藏完全确认的记录，不删除 journal。 */
     suspend fun pending(includeCompleted: Boolean = false): List<PendingBugReport> = workspaceMutex.withLock {
         workspace?.readPending()?.filter { includeCompleted || !it.complete() } ?: emptyList()
     }
@@ -96,6 +113,7 @@ class BugReportRepository(
         entry
     }
 
+    /** 显式移除本机 id，不删除服务端记录或宿主附件。 */
     suspend fun deletePending(id: String) = workspaceMutex.withLock {
         val storage = requireWorkspace()
         storage.writePending(storage.readPending().filterNot { it.id == id })
@@ -185,6 +203,7 @@ class BugReportRepository(
         saveHistory(result.copy(workspaceSaved = workspaceSaved, failedAttachments = entry.draft.attachments), entry.draft)
     }
 
+    /** 仅给 CREATED 的未知附件记录正 fileId；不发请求，用户必须先核查。 */
     suspend fun confirmAttachmentUploaded(id: String, attachmentId: String, fileId: Int) = workspaceMutex.withLock {
         require(fileId > 0)
         val storage = requireWorkspace()
@@ -248,8 +267,10 @@ class BugReportRepository(
     private fun PendingBugReport.complete() = status == PendingBugStatus.CREATED && draft.attachments.all { it.id in uploadedAttachments }
     private fun List<PendingBugReport>.replace(entry: PendingBugReport) = map { if (it.id == entry.id) entry else it }
 
+    /** 读取本机索引，不查询服务端，不隐式发送队列。 */
     suspend fun history(): List<BugSubmissionRecord> = store.readHistory()
 
+    /** 只清安全 Token，保留用户开关、历史及工作区。 */
     suspend fun clearCredentials() = store.clearCredentials()
 
     private companion object {

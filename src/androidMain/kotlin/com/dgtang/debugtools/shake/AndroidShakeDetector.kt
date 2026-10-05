@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlin.math.sqrt
 
+/** Main 线程调用启停；使用 applicationContext、2.7g 阈值与 1200ms 冷却，宿主 close 释放监听。 */
 class AndroidShakeDetector(context: Context) : ShakeDetector, SensorEventListener {
     private val sensorManager = context.applicationContext.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
     private val accelerometer = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)

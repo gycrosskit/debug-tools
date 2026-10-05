@@ -14,7 +14,20 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-/** 命名空间和 Keystore alias 由宿主注入，升级时继续读取既有凭据、开关和历史。 */
+/**
+ * 宿主串行使用的 Android Store，不持有 Activity；升级时保留既有命名空间/密钥 alias。
+ * Token/历史/开关调用线程同步操作，偏好 apply 不保证立即落盘；宿主后台调用安全存储。
+ * 工作区写入切 IO 并 commit 确认落盘，取消不保证撤销已开始的 I/O；坏 journal 不静默清空。
+ * 密钥失效/坏密文只移除 Token；真实 Keystore 行为需要设备验收，不降级明文。
+ * @param json 与宿主既有记录兼容的序列化配置。
+ * @param preferencesName 专属私有偏好名称，不能与其他品牌共享。
+ * @param keyAlias 既有 Android Keystore AES 密钥别名，勿复用到无关能力。
+ * @param tokenKey 加密 Token 键。
+ * @param shakeEnabledKey 用户开关键，缺失默认开启。
+ * @param historyKey 历史 JSON 键，损坏读取为空。
+ * @param draftKey 草稿 JSON 键，损坏读取报错。
+ * @param pendingKey 防重 journal JSON 键，损坏读取报错。
+ */
 class AndroidBugReportStore(
     context: Context,
     private val json: Json,
