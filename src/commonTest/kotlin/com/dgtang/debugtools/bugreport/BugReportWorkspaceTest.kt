@@ -226,6 +226,29 @@ class BugReportWorkspaceTest {
         }
     }
 
+    @Test fun `navigation and editing clear both rendered and typed feedback without clearing the draft`() = runTest {
+        WorkspaceFixture().use { fixture ->
+            val controller = BugReportController(backgroundScope, fixture.repository, hostSource())
+            controller.state.first { !it.loading }
+            val navigation = listOf(controller::openSettings, controller::openHistory, controller::closeSection, controller::openForm)
+            for (navigate in navigation) {
+                controller.submit()
+                assertEquals(BugReportMessage.TITLE_REQUIRED, controller.state.value.notice?.code)
+                navigate()
+                val state = controller.state.first { !it.working }
+                assertEquals("", state.message)
+                assertNull(state.notice)
+                assertFalse(state.isError)
+            }
+            controller.submit()
+            controller.updateTitle("New draft")
+            assertEquals("New draft", controller.state.value.draft.title)
+            assertNull(controller.state.value.notice)
+            assertFalse(controller.state.value.isError)
+            assertEquals(0, fixture.bugRequests)
+        }
+    }
+
     @Test fun `controller uses supplied scope and English messages without androidx lifecycle`() = runTest {
         WorkspaceFixture().use { fixture ->
             val controller = BugReportController(backgroundScope, fixture.repository, object : BugReportHostDataSource {
