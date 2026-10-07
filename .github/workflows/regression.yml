@@ -24,6 +24,7 @@ jobs:
           node-version: '22'
       - run: npm install --prefix "$RUNNER_TEMP/contract-tools" --ignore-scripts --no-audit --no-fund typescript@4.9.5
       - run: |
+          python3 verification/ci/test_fork_host.py
           TYPESCRIPT_PATH="$RUNNER_TEMP/contract-tools/node_modules/typescript" node --test ohos/debug-tools-native/test/debug-tools.test.cjs
   android:
     runs-on: ubuntu-24.04
@@ -37,6 +38,7 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: gradle
+      - run: bash scripts/ci-pin-fork-host.sh
       - run: bash gradlew --init-script "$PWD/scripts/ci-repositories.gradle" jvmTest testDebugUnitTest compileReleaseKotlinAndroid --no-daemon --max-workers=1 --stacktrace --info
   native:
     runs-on: macos-15
@@ -50,6 +52,7 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: gradle
+      - run: bash scripts/ci-pin-fork-host.sh
       - run: |
           ios_test_target=iosSimulatorArm64Test
           if [[ "$(uname -m)" != arm64 ]]; then ios_test_target=iosX64Test; fi
