@@ -78,10 +78,8 @@ class BugReportController(
         }
         automaticEvidence = BugEvidenceSnapshot()
         mutableState.update {
-            it.copy(
+            it.clearFeedback().copy(
                 section = BugReportSection.FORM,
-                message = "",
-                submittedUrl = "",
             )
         }
         loadEvidence()
@@ -89,17 +87,17 @@ class BugReportController(
 
     /** 切换设置区，保留用户草稿。 */
     fun openSettings() = mutableState.update {
-        it.copy(section = BugReportSection.SETTINGS, message = "")
+        it.clearFeedback().copy(section = BugReportSection.SETTINGS)
     }
 
     /** 切换历史区，不重新发送待提交记录。 */
     fun openHistory() = mutableState.update {
-        it.copy(section = BugReportSection.HISTORY, message = "")
+        it.clearFeedback().copy(section = BugReportSection.HISTORY)
     }
 
     /** 返回首页，保留工作区记录；不取消正在进行的厂商/网络操作。 */
     fun closeSection() = mutableState.update {
-        it.copy(section = BugReportSection.HOME, message = "")
+        it.clearFeedback().copy(section = BugReportSection.HOME)
     }
 
     /** 更新标题并串行排队保存，保留前 120 个 UTF-16 字符；loading/working 时忽略。 */
@@ -277,7 +275,7 @@ class BugReportController(
         val current = mutableState.value
         if (current.working || current.loading) return
         val draft = current.draft.transform()
-        mutableState.value = current.copy(draft = draft, message = "", notice = null, submittedUrl = "")
+        mutableState.value = current.clearFeedback().copy(draft = draft)
         val previousSave = draftSaveJob
         if (repository.draftsAvailable) draftSaveJob = viewModelScope.launch {
             try { previousSave?.join(); repository.saveDraft(draft) }
@@ -299,7 +297,7 @@ class BugReportController(
 
     private fun runOperation(successNotice: BugReportNotice?, operation: suspend () -> Unit) {
         if (mutableState.value.loading || mutableState.value.working) return
-        mutableState.update { it.copy(working = true, message = "", isError = false) }
+        mutableState.update { it.clearFeedback().copy(working = true) }
         viewModelScope.launch {
             try {
                 operation()
@@ -316,4 +314,10 @@ class BugReportController(
             }
         }
     }
+
+    // 两种渲染层可以读 message 或 typed notice；清理必须同步，不清历史、草稿或待核查记录。
+    private fun BugReportUiState.clearFeedback() = copy(
+        message = "", notice = null, isError = false, submittedUrl = "",
+        attachmentNotice = null, failedAttachments = emptyList(),
+    )
 }
