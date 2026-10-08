@@ -170,51 +170,7 @@ staging 位于 `build/maven/<版本>`，不用 mavenLocal。`verification-consum
 组件权利人授权以 [Apache-2.0](LICENSE) 发布，第三方依赖遵循各自许可证。
 [GitHub](https://github.com/gycrosskit/debug-tools) · [Release](https://github.com/gycrosskit/debug-tools/releases) · [Issues](https://github.com/gycrosskit/debug-tools/issues)。反馈只提交脱敏复现信息。
 
-## 0.1.3 发布候选
-
-提交开始时冻结草稿与自动证据，异步采集上下文期间重新打开表单不会替换正在提交的证据。
-公开状态仍不暴露自动证据；导航切换与远端成功、本机历史失败语义保持。
-
-本轮 Android 22 项与 Simulator 23 项实际测试通过，另 2 项 Keychain 测试仍明确跳过；iOS arm64 编译通过。
-证据冻结回归用真实 ViewModel/MockEngine 先红后绿，没有发送真实 Bug 请求。
-
-| 该版本配套渠道 | 配套版本 |
-| --- | --- |
-| Maven | `0.1.3` |
-
-没有独立 Pod/SPM/HAR；Keychain 两项 runner 限制仍保留。候选已完成发布与新版本远程消费；设备行为不由编译/链接推断。
-
-## 0.1.3 发布与远程验收
-
-Fresh macOS staging 与归档解包复验均通过，全部 5 个 publication 的声明文件四类哈希、四类 sidecar、Apache-2.0 POM 及同名 available-at 目标身份均已校验。Maven 归档 SHA-256：`59fa9aadd5d869bed4f456937acf1e65316357d9d78accb80371a833da76b9de`。
-
-Maven `0.1.3`；没有额外原生源码发布渠道。
-
-不可变标签与 prerelease 已发布，所有 Release 附件重下载 SHA 与清单匹配。JitPack 新版本最终 ok/isTag/public 且 commit 匹配 tag，全部 5 module、6 个文件引用、5 个 available-at 的 HTTP/四类声明 hash/身份验证通过。新版真实远程 consumer 已通过；设备与业务 SDK 动作未验。
-
-精确 JitPack 0.1.3 新目录消费者：29 tasks / 28s，Android AAR、iOS 三架构编译及 simulator Framework。首次 fresh staging 因 SDK 路径缺省失败，归档入口补 ANDROID_HOME 默认值后定向重跑通过；没有重复整仓验证。
-
-实际日志与 JSON 账单位于 `build/remote-library-review/`。真实设备、业务账号登录/聊天/直播/PiP、权限 UI、真实 Bug/通知发送未执行。
-
-## 0.2.0-rc.1 发布与远程验收
-
-[发布 PR #7](https://github.com/gycrosskit/debug-tools/pull/7) 已合并；不可变 [0.2.0-rc.1 Release](https://github.com/gycrosskit/debug-tools/releases/tag/0.2.0-rc.1) 指向 `c173ef3bb7db01d085382605947e91a4633868f1`。Maven/HAR/清单三个附件重下载字节一致。
-
-JitPack 最终 ok/isTag/public、commit 匹配；九模块 POM/GMM、全部变体文件大小与声明四类 hash、内部依赖和 available-at 身份通过。九个产物的公开 MD5/SHA1 sidecar 通过；SHA256/SHA512 sidecar 返回 404，未将其计为下载验证通过。
-
-全新 Maven 坐标消费者从 JitPack 下载，Android、iOS Arm64/x64/Simulator Framework 和 OHOS 编译通过，28s、13 个任务全部执行；没有 init script、staging、mavenLocal 或源码替换。
-
-OHPM 已提交审核，当前查询 `NOTFOUND`，未上架。鸿蒙使用 [同版 Release HAR](https://github.com/gycrosskit/debug-tools/releases/download/0.2.0-rc.1/debug-tools-native-0.2.0-rc.1.har)，SHA-256：`bedd05d52bed6d1a44fbd58a59748df30845c74ac463e8c06baf08d37a87970b`。Maven 归档 SHA-256：`7dec314543f45f8ef38b9a08b9c47b742d143c5a740d58e0deb7e2bb30e6d951`。
-
-生产宿主已开始接入；构建与接入结果由宿主接入文档记录。真实安全存储、传感器、禅道写入和业务设备验收未执行，不能从本段推断。
-
-## 0.2.0-rc.2 本轮测试与远程验收
-
-2026-10-05：本轮自有源码和公开 API 审查、关键回归与受影响平台编译通过；真实 JitPack `0.2.0-rc.2` 的最终标签提交、9 个 publications 的 POM/Module、所有变体文件大小与四种声明哈希、内部精确版本及 available-at 均通过。Release Maven 归档重新下载 SHA-256 为 `cd45b6f66ce2bb7bb955c541cd56d65a04e05dabc4d25cddd1ee100672bf87dd`。公开 MD5/SHA-1 sidecar 通过；SHA-256/SHA-512 sidecar 的 HTTP 404 记录为渠道缺失。
-
-干净消费工程使用固定远程版本，没有本地 Maven、includeBuild 或其他组件源码替代；通过现有入口的 Android/iOS / OHOS 编译和相应最终链接。
-
-完整回归范围、精简原则、注释契约与仍需设备/业务验收的边界见 [14 个功能组件测试与 API 审查](https://github.com/gycrosskit/.github/blob/main/docs/组件测试与API审查.md)。源码测试与远程消费不代替真机和厂商业务验收。
+历史候选、归档 SHA 与远程验收见[版本记录](docs/版本记录.md)。
 
 ## 自动回归
 
