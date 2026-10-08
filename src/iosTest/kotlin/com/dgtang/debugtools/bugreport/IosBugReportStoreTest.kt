@@ -47,16 +47,13 @@ class IosBugReportStoreTest {
             preferences.setObject(Json.encodeToString(history), "debug_bug_reporting_history")
             assertFalse(store.readShakeEnabled())
             assertEquals(history, store.readHistory())
-            store.clearCredentials()
-            assertFalse(store.readShakeEnabled())
-            assertEquals(history, store.readHistory())
         } finally {
             preferences.removePersistentDomainForName(suite)
         }
     }
 
     @Test
-    fun `workspace survives reopening and credentials clearing using native atomic files`() = runTest {
+    fun `workspace survives reopening using native atomic files`() = runTest {
         val suite = "debug-tools-workspace-${Random.nextLong()}"
         val preferences = NSUserDefaults(suiteName = suite)
         val directory = NSTemporaryDirectory() + suite
@@ -67,7 +64,6 @@ class IosBugReportStoreTest {
             store.writeDraft(draft)
             store.writePending(pending)
             val reopened = IosBugReportStore(Json, suite, "test-token", suite, preferences, workspaceDirectory = directory)
-            reopened.clearCredentials()
             assertEquals(draft, reopened.readDraft())
             assertEquals(pending, reopened.readPending())
         } finally {

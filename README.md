@@ -2,7 +2,7 @@
 
 2026-10-08 功能索引：core提供Controller/REST/存储与传感器，库没有CMP/Kuikly表单UI；A/i宿主消费core，debug-tools-kuikly仅提供OHOS桥。 详见[功能与平台差异](docs/功能与平台差异.md)，含固定基线、五入口矩阵、真实回归与未验收范围。当前发布组合：Maven 0.2.0-rc.5；未变OHOS HAR继续0.2.0-rc.3。各渠道消费与设备验收分别核对。
 
-最终核对（2026-10-08）：本轮重跑JVM35项；前轮Android42与App-hosted Keychain正常路径复用，系统失败保护仍仅源码核对。 逐项时点与边界见[验证范围](docs/功能与平台差异.md#sdk系统与真实验证范围)。
+最终核对（2026-10-08）：最终审查重跑JVM35项；发布门禁修正后另实跑iOS普通存储2项（原2项Keychain跳过保留），正常签名App重新验证生产Keychain增改查删及清凭据保留history/settings/draft/pending。Android42项复用前轮结果，系统失败保护仍仅源码核对。 逐项时点与边界见[验证范围](docs/功能与平台差异.md#sdk系统与真实验证范围)。
 
 Android、iOS、HarmonyOS 共用的 Bug 上报组件：草稿、提交状态、安全 Token、本机历史、摇动触发、页面轨迹、证据格式化和禅道 REST 协议。保留 `com.dgtang.debugtools.bugreport` API；表单 UI、品牌、导航和诊断采集由宿主提供。
 
