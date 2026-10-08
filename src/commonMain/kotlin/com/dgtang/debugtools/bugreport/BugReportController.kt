@@ -3,6 +3,7 @@ package com.dgtang.debugtools.bugreport
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -63,11 +64,13 @@ class BugReportController(
     private val mutableState = MutableStateFlow(BugReportUiState())
     private var automaticEvidence = BugEvidenceSnapshot()
     private var draftSaveJob: Job? = null
+    private var initialRecoverySucceeded = false
+    private val initialRecovery: Job
     /** 只读状态流；观察者与页面同生命周期，不含自动证据或凭据。 */
     val state = mutableState.asStateFlow()
 
     init {
-        refresh()
+        initialRecovery = refresh()
     }
 
     /** 打开表单并异步读取一次自动证据；配置不可用时报告，不发提交请求。 */
@@ -116,9 +119,14 @@ class BugReportController(
         check(value.isEmpty() || repository.attachmentsAvailable)
         updateDraft { copy(attachments = value) }
     }
-    /** 等待排队保存并确认当前草稿落盘；取消/失败向调用方传播，离页前由宿主调用。 */
+    /** 等待初始恢复成功及排队保存后确认草稿落盘；恢复失败/取消不覆盖工作区，离页前由宿主调用。 */
     suspend fun flushDraft() {
+        viewModelScope.ensureActive()
+        initialRecovery.join()
+        // loading=false 也可能是恢复失败；默认空稿绝不能覆盖尚未读出的工作区。
+        check(initialRecoverySucceeded && !initialRecovery.isCancelled) { "Initial draft recovery did not complete successfully" }
         draftSaveJob?.join()
+        viewModelScope.ensureActive()
         repository.saveDraft(mutableState.value.draft)
     }
     /** 显式保存草稿并显示结果；working 时忽略重复操作。 */
@@ -244,34 +252,33 @@ class BugReportController(
         }
     }
 
-    private fun refresh() {
-        viewModelScope.launch {
-            runCatching {
-                val settings = repository.settings()
-                val history = repository.history()
-                val draft = repository.draft()
-                val pending = repository.pending()
-                mutableState.update {
-                    it.copy(
-                        loading = false,
-                        tokenConfigured = settings.tokenConfigured,
-                        shakeEnabled = settings.shakeEnabled,
-                        history = history, draft = draft, pending = pending,
-                    )
-                }
-            }.onFailure { error ->
-                if (error is CancellationException) throw error
-                val notice = (error as? BugReportException)?.notice ?: BugReportNotice(BugReportMessage.OPERATION_FAILED)
-                mutableState.update { it.copy(loading = false, notice = notice, message = formatMessage(notice), isError = true) }
+    private fun refresh(): Job = viewModelScope.launch {
+        runCatching {
+            val settings = repository.settings()
+            val history = repository.history()
+            val draft = repository.draft()
+            val pending = repository.pending()
+            initialRecoverySucceeded = true
+            mutableState.update {
+                it.copy(
+                    loading = false,
+                    tokenConfigured = settings.tokenConfigured,
+                    shakeEnabled = settings.shakeEnabled,
+                    history = history, draft = draft, pending = pending,
+                )
             }
-            // 摇动/深链可以在恢复期间打开表单；只为仍停留在表单的页面补采集一次。
-            if (mutableState.value.section == BugReportSection.FORM) loadEvidence()
+        }.onFailure { error ->
+            if (error is CancellationException) throw error
+            val notice = (error as? BugReportException)?.notice ?: BugReportNotice(BugReportMessage.OPERATION_FAILED)
+            mutableState.update { it.copy(loading = false, notice = notice, message = formatMessage(notice), isError = true) }
         }
+        // 摇动/深链可以在恢复期间打开表单；只为仍停留在表单的页面补采集一次。
+        if (mutableState.value.section == BugReportSection.FORM) loadEvidence()
     }
 
     private fun updateDraft(transform: BugReportDraft.() -> BugReportDraft) {
         val current = mutableState.value
-        if (current.working || current.loading) return
+        if (current.working || current.loading || !initialRecoverySucceeded) return
         val draft = current.draft.transform()
         mutableState.value = current.clearFeedback().copy(draft = draft)
         val previousSave = draftSaveJob
@@ -294,7 +301,7 @@ class BugReportController(
     }
 
     private fun runOperation(successNotice: BugReportNotice?, operation: suspend () -> Unit) {
-        if (mutableState.value.loading || mutableState.value.working) return
+        if (mutableState.value.loading || mutableState.value.working || !initialRecoverySucceeded) return
         mutableState.update { it.clearFeedback().copy(working = true) }
         viewModelScope.launch {
             try {
