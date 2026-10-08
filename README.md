@@ -1,6 +1,6 @@
 # GY CrossKit Debug Tools
 
-> 2026-10-08 发布候选：Maven 0.2.0-rc.6；源码修复与 CI 配置准备完成，发布归档、严格公开检查和新坐标远程消费以本次 Release 结果为准；真实设备与宿主业务尚未验收。
+> 2026-10-08 已发布预发行：Maven 0.2.0-rc.6。冻结归档与严格公开产物检查已通过；[精确版本 Release](https://github.com/gycrosskit/debug-tools/releases/tag/0.2.0-rc.6)、[远程消费 CI](https://github.com/gycrosskit/debug-tools/actions/runs/37769707370)分别记录产物和 Android/Native 结果。真实设备、云账号与宿主业务尚未验收。
 
 2026-10-08 功能索引：core提供Controller/REST/存储与传感器，库没有CMP/Kuikly表单UI；A/i宿主消费core，debug-tools-kuikly仅提供OHOS桥。 详见[功能与平台差异](docs/功能与平台差异.md)，含固定基线、五入口矩阵、真实回归与未验收范围。当前发布组合：Maven 0.2.0-rc.6；未变OHOS HAR继续0.2.0-rc.3。各渠道消费与设备验收分别核对。
 
@@ -155,7 +155,7 @@ Controller 操作使用宿主 UI/Page 的串行 scope；Store 的 suspend 签名
 
 ## 开发与验证
 
-历史99项Kotlin测试、4项鸿蒙原生模拟测试和产物范围见[开发与验证](docs/开发与验证.md)。2026-10-08候选另有JVM35/Android42项回归与实际Xcode Simulator App-hosted生产Keychain增改查删通过；旧standalone跳过测试没有计为PASS。系统锁屏/失败注入、HUKS/Keystore、真实传感器和禅道写入仍待验收，精确范围见[功能与平台差异](docs/功能与平台差异.md)。
+历史99项Kotlin测试、4项鸿蒙原生模拟测试和产物范围见[开发与验证](docs/开发与验证.md)。2026-10-08发布前验证另有JVM35/Android42项回归与实际Xcode Simulator App-hosted生产Keychain增改查删通过；旧standalone跳过测试没有计为PASS。系统锁屏/失败注入、HUKS/Keystore、真实传感器和禅道写入仍待验收，精确范围见[功能与平台差异](docs/功能与平台差异.md)。
 
 ```bash
 bash gradlew --no-daemon --max-workers=1 --no-parallel \
@@ -218,7 +218,7 @@ OHPM 已提交审核，当前查询 `NOTFOUND`，未上架。鸿蒙使用 [同�
 
 ## 自动回归
 
-[Source regression](.github/workflows/regression.yml) 的当前工作树候选按事件分阶段：PR 先判断变更范围，仅源码变更运行已有 Android/Native 测试与编译；纯文档 PR 和 `main` push 只运行轻量脚本/配置检查。手动运行不填版本时执行源码回归，未知路径保守按源码处理。线上生效与耗时以实际 Actions 运行为准。
+[Source regression](.github/workflows/regression.yml) 按事件分阶段：PR 先判断变更范围，仅源码变更运行已有 Android/Native 测试与编译；纯文档 PR 和 `main` push 只运行轻量脚本/配置检查。手动运行不填版本时执行源码回归，未知路径保守按源码处理。线上生效与耗时以实际 Actions 运行为准。
 
 [Release validation](.github/workflows/release-validation.yml) 在 Maven Release 发布或手动填写精确已发布版本时，`verify-public` 统一校验一次冻结归档、精确 tag/commit、完整 publication 清单和公开文件；通过后 Android/Native 独立消费者从 JitPack 解析该版本。PR 不再反复消费旧基线；不使用 `mavenLocal`、本库源码或归档替换远程依赖。此流程不发布二进制。
 
