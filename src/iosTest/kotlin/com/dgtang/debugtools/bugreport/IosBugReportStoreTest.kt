@@ -86,6 +86,8 @@ class IosBugReportStoreTest {
             store.writeToken("fixture-token")
             val reopened = IosBugReportStore(Json, suite, "test-token", "test", preferences)
             assertEquals("fixture-token", reopened.readToken())
+            reopened.writeToken("replacement-token")
+            assertEquals("replacement-token", store.readToken())
             assertEquals(null, preferences.stringForKey("zentao_token"))
             reopened.clearCredentials()
             assertEquals("", store.readToken())

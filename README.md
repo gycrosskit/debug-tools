@@ -1,8 +1,14 @@
 # GY CrossKit Debug Tools
 
+2026-10-08 功能索引：core提供Controller/REST/存储与传感器，库没有CMP/Kuikly表单UI；A/i宿主消费core，debug-tools-kuikly仅提供OHOS桥。 详见[功能与平台差异](docs/功能与平台差异.md)，含固定基线、五入口矩阵、真实回归与未验收范围。当前发布组合：Maven 0.2.0-rc.5；未变OHOS HAR继续0.2.0-rc.3。各渠道消费与设备验收分别核对。
+
+最终核对（2026-10-08）：本轮重跑JVM35项；前轮Android42与App-hosted Keychain正常路径复用，系统失败保护仍仅源码核对。 逐项时点与边界见[验证范围](docs/功能与平台差异.md#sdk系统与真实验证范围)。
+
 Android、iOS、HarmonyOS 共用的 Bug 上报组件：草稿、提交状态、安全 Token、本机历史、摇动触发、页面轨迹、证据格式化和禅道 REST 协议。保留 `com.dgtang.debugtools.bugreport` API；表单 UI、品牌、导航和诊断采集由宿主提供。
 
-预发布 Maven **0.2.0-rc.3**（`debug-tools` / `debug-tools-kuikly`）与 Release HAR **0.2.0-rc.3**：初始恢复期间阻止旧快照覆盖新凭据操作，鸿蒙桥严格拒绝 null 和错误参数类型。新标签Release/JitPack文件与新目录Maven实际消费已通过，OHPM仍审核、Release HAR fallback消费已通过，结果见 [完整审查](docs/完整审查.md)；后面的 rc.1/rc.2 为历史验收。
+历史预发布 Maven **0.2.0-rc.3**（`debug-tools` / `debug-tools-kuikly`）与 Release HAR **0.2.0-rc.3**：初始恢复期间阻止旧快照覆盖新凭据操作，鸿蒙桥严格拒绝 null 和错误参数类型。新标签Release/JitPack文件与新目录Maven实际消费已通过，OHPM仍审核、Release HAR fallback消费已通过，结果见 [完整审查](docs/完整审查.md)；后面的 rc.1/rc.2 为历史验收。
+
+当前 Maven 为 `0.2.0-rc.5`，HAR 保持 `0.2.0-rc.3`；以上 rc.3 为历史说明。本版将 iOS 摇动冷却改为 CoreMotion 采样的单调时间戳，与 Android/OHOS 同样不受系统时间调整影响；阈值、冷却时长与生命周期保持原合同。
 
 ## 本版对齐范围
 
@@ -112,21 +118,21 @@ classDiagram
 三端使用 JitPack，配套依赖仓库配置见 [独立消费工程](verification-consumer/settings.gradle.kts)：
 
 ```kotlin
-implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.3")
+implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.4")
 ```
 
 三端固定预发布坐标如下（JitPack 与新版新目录远程消费通过，设备业务另验）：
 
 ```kotlin
 commonMain.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.3")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.4")
 }
 ohosArm64Main.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:0.2.0-rc.3")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:0.2.0-rc.4")
 }
 ```
 
-鸿蒙原生配套包为 `@gycrosskit/debug-tools-native@0.2.0-rc.3`，OHPM 已提交审核，公开精确版本仍 `NOTFOUND`；`next` 仍指向 rc.1。当前使用 [不可变 Release HAR](https://github.com/gycrosskit/debug-tools/releases/tag/0.2.0-rc.3)，SHA-256 为 `b65c2028968aa8e2b05b1032fbfdae3c66fe6d6834ebc89e72b2297b5c5da532`；不得把审核提交等同于 registry 已安装。配置、迁移键、手动恢复和生命周期例子见 [接入指南](docs/接入指南.md)；原生注册见 [HAR README](ohos/debug-tools-native/README.md)。
+鸿蒙原生配套包为 `@gycrosskit/debug-tools-native@0.2.0-rc.3`。历史验收时 OHPM 已提交审核，精确版本曾 `NOTFOUND`、`next` 当时指向 rc.1；此为历史记录，不能代替当前 Registry 查询。固定归档为 [不可变 Release HAR](https://github.com/gycrosskit/debug-tools/releases/tag/0.2.0-rc.3)，SHA-256 为 `b65c2028968aa8e2b05b1032fbfdae3c66fe6d6834ebc89e72b2297b5c5da532`；不得把审核提交等同于 registry 已安装。配置、迁移键、手动恢复和生命周期例子见 [接入指南](docs/接入指南.md)；原生注册见 [HAR README](ohos/debug-tools-native/README.md)。
 
 ## 最小接入
 
@@ -147,7 +153,7 @@ Controller 操作使用宿主 UI/Page 的串行 scope；Store 的 suspend 签名
 
 ## 开发与验证
 
-实际命令、99 项 Kotlin 测试、4 项鸿蒙原生模拟测试、HAR、本地与远程产物检查见 [开发与验证](docs/开发与验证.md)。两项 iOS Keychain 测试因 runner 系统服务不可用明确跳过；真实 HUKS/Keystore/Keychain、传感器和禅道写入由使用方验收。
+历史99项Kotlin测试、4项鸿蒙原生模拟测试和产物范围见[开发与验证](docs/开发与验证.md)。2026-10-08候选另有JVM35/Android42项回归与实际Xcode Simulator App-hosted生产Keychain增改查删通过；旧standalone跳过测试没有计为PASS。系统锁屏/失败注入、HUKS/Keystore、真实传感器和禅道写入仍待验收，精确范围见[功能与平台差异](docs/功能与平台差异.md)。
 
 ```bash
 bash gradlew --no-daemon --max-workers=1 --no-parallel \

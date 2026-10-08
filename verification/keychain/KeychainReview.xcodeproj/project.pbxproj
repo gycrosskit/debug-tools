@@ -1,0 +1,16 @@
+// !$*UTF8*$!
+{archiveVersion=1;classes={};objectVersion=56;objects={
+ A00000000000000000000001={isa=PBXProject;buildConfigurationList=A00000000000000000000010;compatibilityVersion="Xcode 14.0";developmentRegion=en;knownRegions=(en,Base);mainGroup=A00000000000000000000002;productRefGroup=A00000000000000000000003;projectDirPath="";targets=(A00000000000000000000004);};
+ A00000000000000000000002={isa=PBXGroup;children=(A00000000000000000000005,A00000000000000000000003);sourceTree="<group>";};
+ A00000000000000000000003={isa=PBXGroup;children=(A00000000000000000000006);name=Products;sourceTree="<group>";};
+ A00000000000000000000004={isa=PBXNativeTarget;buildConfigurationList=A00000000000000000000011;buildPhases=(A00000000000000000000008,A00000000000000000000009);buildRules=();dependencies=();name=KeychainReview;productName=KeychainReview;productReference=A00000000000000000000006;productType="com.apple.product-type.application";};
+ A00000000000000000000005={isa=PBXFileReference;lastKnownFileType=sourcecode.swift;path=Main.swift;sourceTree="<group>";};
+ A00000000000000000000006={isa=PBXFileReference;explicitFileType=wrapper.application;includeInIndex=0;path=KeychainReview.app;sourceTree=BUILT_PRODUCTS_DIR;};
+ A00000000000000000000007={isa=PBXBuildFile;fileRef=A00000000000000000000005;};
+ A00000000000000000000008={isa=PBXSourcesBuildPhase;buildActionMask=2147483647;files=(A00000000000000000000007);runOnlyForDeploymentPostprocessing=0;};
+ A00000000000000000000009={isa=PBXFrameworksBuildPhase;buildActionMask=2147483647;files=();runOnlyForDeploymentPostprocessing=0;};
+ A00000000000000000000010={isa=XCConfigurationList;buildConfigurations=(A00000000000000000000012);defaultConfigurationIsVisible=0;defaultConfigurationName=Debug;};
+ A00000000000000000000011={isa=XCConfigurationList;buildConfigurations=(A00000000000000000000013);defaultConfigurationIsVisible=0;defaultConfigurationName=Debug;};
+ A00000000000000000000012={isa=XCBuildConfiguration;name=Debug;buildSettings={SDKROOT=iphonesimulator;IPHONEOS_DEPLOYMENT_TARGET=15.0;SWIFT_VERSION=5.0;};};
+ A00000000000000000000013={isa=XCBuildConfiguration;name=Debug;buildSettings={PRODUCT_BUNDLE_IDENTIFIER="io.github.gycrosskit.debug.keychain-review";PRODUCT_NAME="$(TARGET_NAME)";GENERATE_INFOPLIST_FILE=YES;INFOPLIST_KEY_UIApplicationSceneManifest_Generation=YES;CODE_SIGNING_ALLOWED=YES;CODE_SIGN_IDENTITY="-";CODE_SIGN_STYLE=Manual;CODE_SIGN_ENTITLEMENTS=KeychainReview.entitlements;FRAMEWORK_SEARCH_PATHS="$(PROJECT_DIR)/../../build/bin/iosSimulatorArm64/debugFramework";OTHER_LDFLAGS=("-framework",DebugKeychainReview,"-framework",Security,"-dead_strip");SUPPORTED_PLATFORMS=iphonesimulator;TARGETED_DEVICE_FAMILY="1,2";};};
+};rootObject=A00000000000000000000001;}

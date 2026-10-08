@@ -32,6 +32,8 @@ import platform.Foundation.create
 import platform.Security.SecItemAdd
 import platform.Security.SecItemCopyMatching
 import platform.Security.SecItemDelete
+import platform.Security.SecItemUpdate
+import platform.Security.errSecItemNotFound
 import platform.Security.errSecSuccess
 import platform.Security.kSecAttrAccount
 import platform.Security.kSecAttrService
@@ -91,12 +93,16 @@ class IosBugReportStore(
     }
 
     override suspend fun writeToken(value: String) {
-        clearCredentials()
         val bytes = value.encodeToByteArray()
         val data = bytes.usePinned {
             NSData.create(bytes = if (bytes.isEmpty()) null else it.addressOf(0), length = bytes.size.toULong())
         }
-        check(withKeychainQuery(data = data) { SecItemAdd(it, null) } == errSecSuccess) { "无法保存 Bug 报告 Token" }
+        // 替换失败保留旧 Token；不能先 Delete 再 Add，系统暂不可用时会丢失已有授权。
+        val updated = withKeychainQuery(data = data, identity = false) { attributes ->
+            withKeychainQuery { query -> SecItemUpdate(query, attributes) }
+        }
+        val status = if (updated == errSecItemNotFound) withKeychainQuery(data = data) { SecItemAdd(it, null) } else updated
+        check(status == errSecSuccess) { "无法保存 Bug 报告 Token ($status)" }
     }
 
     override suspend fun readShakeEnabled(): Boolean = if (preferences.objectForKey(shakeEnabledKey) == null) {
@@ -138,20 +144,26 @@ class IosBugReportStore(
     private fun fileName(key: String) = key.encodeToByteArray().joinToString("") { it.toUByte().toString(16).padStart(2, '0') }
 
     override suspend fun clearCredentials() {
-        withKeychainQuery { SecItemDelete(it) }
+        val status = withKeychainQuery { SecItemDelete(it) }
+        check(status == errSecSuccess || status == errSecItemNotFound) { "无法清除 Bug 报告 Token ($status)" }
     }
 
     private inline fun <T> withKeychainQuery(
         includeResult: Boolean = false,
         data: NSData? = null,
+        identity: Boolean = true,
         operation: (CFDictionaryRef) -> T,
     ): T = memScoped {
         val service = CFBridgingRetain(keychainService)
         val account = CFBridgingRetain(keychainAccount)
         val tokenData = CFBridgingRetain(data)
         try {
-            val keys = mutableListOf<CFTypeRef?>(kSecClass, kSecAttrService, kSecAttrAccount)
-            val values = mutableListOf<CFTypeRef?>(kSecClassGenericPassword, service, account)
+            val keys = mutableListOf<CFTypeRef?>()
+            val values = mutableListOf<CFTypeRef?>()
+            if (identity) {
+                keys += listOf(kSecClass, kSecAttrService, kSecAttrAccount)
+                values += listOf(kSecClassGenericPassword, service, account)
+            }
             if (includeResult) {
                 keys += listOf(kSecReturnData, kSecMatchLimit)
                 values += listOf(kCFBooleanTrue, kSecMatchLimitOne)

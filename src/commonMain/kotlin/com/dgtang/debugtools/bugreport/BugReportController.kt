@@ -229,20 +229,18 @@ class BugReportController(
                 draft = if (result.reportId == it.draft.reportId) BugReportDraft() else it.draft,
             )
         }
-        if (result.historySaved) {
-            try {
+        try {
+            // journal 的刷新不依赖可选历史索引，避免成功后仍显示旧 READY/UNKNOWN。
+            refreshPending()
+            if (result.historySaved) {
                 val history = repository.history()
-                val pending = repository.pending()
-                mutableState.update { it.copy(history = history, pending = pending) }
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (_: Exception) {
-                mutableState.update {
-                    BugReportNotice(BugReportMessage.HISTORY_REFRESH_FAILED, bugId = result.id).let { notice ->
-                        it.copy(notice = notice, message = formatMessage(notice))
-                    }
-                }
+                mutableState.update { it.copy(history = history) }
             }
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
+            val notice = BugReportNotice(BugReportMessage.HISTORY_REFRESH_FAILED, bugId = result.id)
+            mutableState.update { it.copy(notice = notice, message = formatMessage(notice)) }
         }
     }
 
