@@ -12,7 +12,7 @@ Android、iOS、HarmonyOS 共用的 Bug 上报组件：草稿、提交状态、�
 
 ## 本版对齐范围
 
-| 能力 | 当前候选范围 |
+| 能力 | 当前范围 |
 | --- | --- |
 | 鸿蒙 Bug 上报 | 共用 Controller/Repository/REST，OHOS KLIB + Kuikly 薄桥 |
 | 鸿蒙 Token 存储 | HUKS AES-256-GCM，随机 nonce，普通偏好只保存密文 |
@@ -106,7 +106,7 @@ classDiagram
 
 ## 支持与安装
 
-| 项目 | 当前候选范围 |
+| 项目 | 当前范围 |
 | --- | --- |
 | 平台 | Android minSdk 24、iOS Arm64/Simulator Arm64/x64、OHOS Arm64；JVM 用于共用核心消费和测试 |
 | 工具链 | Kotlin `2.2.21-1.0.0`、AGP 8.10.1、Gradle 8.11.1、Android JVM 11；Gradle JDK 17+ |
@@ -118,17 +118,17 @@ classDiagram
 三端使用 JitPack，配套依赖仓库配置见 [独立消费工程](verification-consumer/settings.gradle.kts)：
 
 ```kotlin
-implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.4")
+implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.5")
 ```
 
 三端固定预发布坐标如下（JitPack 与新版新目录远程消费通过，设备业务另验）：
 
 ```kotlin
 commonMain.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.4")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.5")
 }
 ohosArm64Main.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:0.2.0-rc.4")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:0.2.0-rc.5")
 }
 ```
 
