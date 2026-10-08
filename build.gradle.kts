@@ -6,7 +6,7 @@ plugins {
 }
 
 group = providers.environmentVariable("GROUP").orElse("com.github.gycrosskit.debug-tools").get()
-version = providers.environmentVariable("VERSION").orElse("0.2.0-rc.5").get()
+version = providers.environmentVariable("VERSION").orElse("0.2.0-rc.6").get()
 
 kotlin {
     androidTarget {
