@@ -1,6 +1,6 @@
 # GY CrossKit 鸿蒙 Debug Tools
 
-配套包：`ohpm install @gycrosskit/debug-tools-native@0.2.0-rc.3`。Maven 与 HAR 须使用同版；OHPM 审核状态和 Release HAR 渠道见仓库根 README 的验收记录。
+配套包：`ohpm install @gycrosskit/debug-tools-native@0.2.0-rc.3`。Maven当前为0.2.0-rc.5，HAR独立保持rc.3，不能要求数字同版；OHPM/Release渠道状态见仓库根README。模块职责、五入口与验证范围见[功能与平台差异](../../docs/功能与平台差异.md)。
 
 将 `GycDebugToolsModule.MODULE_NAME` 注册到 Kuikly renderer；每页持有对应 Module。宿主声明 `ohos.permission.ACCELEROMETER`，在允许调试工具的生命周期内启动/停止摇动。
 

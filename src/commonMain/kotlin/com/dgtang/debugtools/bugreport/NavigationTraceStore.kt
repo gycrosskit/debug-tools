@@ -22,11 +22,7 @@ class NavigationTraceStore(
         if (safePage.isEmpty()) return
         mutableEntries.update { current ->
             if (current.lastOrNull() == safePage) current
-            else if (current.size < capacity) current + safePage
-            else buildList(capacity) {
-                addAll(current.subList(1, current.size))
-                add(safePage)
-            }
+            else (current + safePage).takeLast(capacity)
         }
     }
 

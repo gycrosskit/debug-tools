@@ -249,6 +249,26 @@ class BugReportWorkspaceTest {
         }
     }
 
+    @Test fun `successful creation refreshes pending even when history save or refresh fails`() = runTest {
+        for (failAtRead in listOf(2, 3)) {
+            WorkspaceFixture().use { fixture ->
+                fixture.store.savedDraft = DRAFT
+                var reads = 0
+                fixture.store.beforeHistory = { if (++reads == failAtRead) error("history unavailable") }
+                val controller = BugReportController(backgroundScope, fixture.repository, hostSource())
+                controller.state.first { !it.loading }
+                controller.queueDraft()
+                controller.state.first { !it.working }
+                val pending = controller.state.value.pending.single()
+                controller.submitPending(pending.id)
+                val state = controller.state.first { !it.working && it.submittedUrl.isNotBlank() }
+                assertFalse(state.isError)
+                assertTrue(state.pending.isEmpty())
+                assertEquals(1, fixture.bugRequests)
+            }
+        }
+    }
+
     @Test fun `controller uses supplied scope and English messages without androidx lifecycle`() = runTest {
         WorkspaceFixture().use { fixture ->
             val controller = BugReportController(backgroundScope, fixture.repository, object : BugReportHostDataSource {
