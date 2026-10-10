@@ -4,8 +4,6 @@
 
 2026-10-08 功能索引：core提供Controller/REST/存储与传感器，库没有CMP/Kuikly表单UI；A/i宿主消费core，debug-tools-kuikly仅提供OHOS桥。 详见[功能与平台差异](docs/功能与平台差异.md)，含固定基线、五入口矩阵、真实回归与未验收范围。当前发布组合：Maven 0.2.0-rc.6；未变OHOS HAR继续0.2.0-rc.3。各渠道消费与设备验收分别核对。
 
-最终核对（2026-10-08）：最终审查重跑JVM35项；发布门禁修正后另实跑iOS普通存储2项（原2项Keychain跳过保留），正常签名App重新验证生产Keychain增改查删及清凭据保留history/settings/draft/pending。Android42项复用前轮结果，系统失败保护仍仅源码核对。 逐项时点与边界见[验证范围](docs/功能与平台差异.md#sdk系统与真实验证范围)。
-
 Android、iOS、HarmonyOS 共用的 Bug 上报组件：草稿、提交状态、安全 Token、本机历史、摇动触发、页面轨迹、证据格式化和禅道 REST 协议。保留 `com.dgtang.debugtools.bugreport` API；表单 UI、品牌、导航和诊断采集由宿主提供。
 
 历史预发布 Maven **0.2.0-rc.3**（`debug-tools` / `debug-tools-kuikly`）与 Release HAR **0.2.0-rc.3**：初始恢复期间阻止旧快照覆盖新凭据操作，鸿蒙桥严格拒绝 null 和错误参数类型。新标签Release/JitPack文件与新目录Maven实际消费已通过，OHPM仍审核、Release HAR fallback消费已通过，结果见 [完整审查](docs/完整审查.md)；后面的 rc.1/rc.2 为历史验收。
@@ -155,7 +153,7 @@ Controller 操作使用宿主 UI/Page 的串行 scope；Store 的 suspend 签名
 
 ## 开发与验证
 
-历史99项Kotlin测试、4项鸿蒙原生模拟测试和产物范围见[开发与验证](docs/开发与验证.md)。2026-10-08发布前验证另有JVM35/Android42项回归与实际Xcode Simulator App-hosted生产Keychain增改查删通过；旧standalone跳过测试没有计为PASS。系统锁屏/失败注入、HUKS/Keystore、真实传感器和禅道写入仍待验收，精确范围见[功能与平台差异](docs/功能与平台差异.md)。
+开发命令与历史候选见[开发与验证](docs/开发与验证.md)；发布前执行身份、结果与未验收范围统一见[验证表](docs/功能与平台差异.md#sdk系统与真实验证范围)。历史结果不代表本次文档修正重新执行。
 
 ```bash
 bash gradlew --no-daemon --max-workers=1 --no-parallel \
