@@ -1,6 +1,6 @@
 # GY CrossKit Debug Tools
 
-2026-10-18 未发布源码修复：增加 Android/iOS 同物理存储键判重，防止自定义键覆盖 journal；OHOS 沿用已有判重。保留原生 core、Controller、Android/iOS ViewModel 与 OHOS Kuikly Module，不提供表单 UI。本次未发布新 Maven/HAR，旧发布验收不代算本次修复。
+2026-10-18 Maven `0.2.0-rc.7` 准备中：增加 Android/iOS 同物理存储键判重，防止自定义键覆盖 journal；OHOS 沿用已有判重。保留原生 core、Controller、Android/iOS ViewModel 与 OHOS Kuikly Module，不提供表单 UI。归档、完整 CI 与精确公开消费待该 RC 证据；未变 HAR 保持 `0.2.0-rc.3`，没有独立 Pod/SPM，旧验收不代算本次修复。
 
 > 2026-10-08 已发布预发行：Maven 0.2.0-rc.6。冻结归档与严格公开产物检查已通过；[精确版本 Release](https://github.com/gycrosskit/debug-tools/releases/tag/0.2.0-rc.6)、[远程消费 CI](https://github.com/gycrosskit/debug-tools/actions/runs/37769707370)分别记录产物和 Android/Native 结果。真实设备、云账号与宿主业务尚未验收。
 
@@ -10,7 +10,7 @@ Android、iOS、HarmonyOS 共用的 Bug 上报组件：草稿、提交状态、�
 
 历史预发布 Maven **0.2.0-rc.3**（`debug-tools` / `debug-tools-kuikly`）与 Release HAR **0.2.0-rc.3**：初始恢复期间阻止旧快照覆盖新凭据操作，鸿蒙桥严格拒绝 null 和错误参数类型。新标签Release/JitPack文件与新目录Maven实际消费已通过，OHPM仍审核、Release HAR fallback消费已通过，结果见 [完整审查](docs/完整审查.md)；后面的 rc.1/rc.2 为历史验收。
 
-当前 Maven 为 `0.2.0-rc.6`，HAR 保持 `0.2.0-rc.3`；以上 rc.3 为历史说明。本版将 iOS 摇动冷却改为 CoreMotion 采样的单调时间戳，与 Android/OHOS 同样不受系统时间调整影响；阈值、冷却时长与生命周期保持原合同。
+已发布基线 Maven 为 `0.2.0-rc.6`，HAR 保持 `0.2.0-rc.3`；以上 rc.3 为历史说明。rc.6 已将 iOS 摇动冷却改为 CoreMotion 采样的单调时间戳，与 Android/OHOS 同样不受系统时间调整影响；阈值、冷却时长与生命周期保持原合同。
 
 ## 本版对齐范围
 
@@ -120,17 +120,17 @@ classDiagram
 三端使用 JitPack，配套依赖仓库配置见 [独立消费工程](verification-consumer/settings.gradle.kts)：
 
 ```kotlin
-implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.6")
+implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.7")
 ```
 
-三端固定预发布坐标如下（JitPack 与新版新目录远程消费通过，设备业务另验）：
+三端候选坐标如下（rc.7 的 JitPack 公开产物与新目录消费待验，设备业务另验）：
 
 ```kotlin
 commonMain.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.6")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.7")
 }
 ohosArm64Main.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:0.2.0-rc.6")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:0.2.0-rc.7")
 }
 ```
 
@@ -162,10 +162,10 @@ bash gradlew --no-daemon --max-workers=1 --no-parallel \
   jvmTest testDebugUnitTest iosSimulatorArm64Test \
   compileKotlinIosArm64 compileKotlinIosX64 \
   :debug-tools-kuikly:compileKotlinOhosArm64 publishAllPublicationsToStagingRepository
-bash scripts/export-maven.sh
+VERSION=0.2.0-rc.7 bash scripts/package-maven.sh
 ```
 
-staging 位于 `build/maven/<版本>`，不用 mavenLocal。`verification-consumer` 默认从 JitPack 精确坐标消费；候选可通过外置临时 init script 只替换本组件 group 为 staging。打包入口保留不可变 Release Maven 归档与 SHA 校验方案；源码可从 Git 标签读取。
+staging 位于 `build/maven/<版本>`，不用 mavenLocal。候选输出位于 `build/release/<版本>/`，包含 Maven 归档、`SHA256SUMS` 和 `source-receipt.json`；完整 9 个 publications 检查通过后才归档。`export-maven.sh` 沿用同一入口。`verification-consumer` 默认从 JitPack 精确坐标消费；候选可通过外置临时 init script 只替换本组件 group 为 staging。源码、公开消费和设备验收分别记录。
 
 组件权利人授权以 [Apache-2.0](LICENSE) 发布，第三方依赖遵循各自许可证。
 [GitHub](https://github.com/gycrosskit/debug-tools) · [Release](https://github.com/gycrosskit/debug-tools/releases) · [Issues](https://github.com/gycrosskit/debug-tools/issues)。反馈只提交脱敏复现信息。
