@@ -49,6 +49,7 @@ import platform.posix.memcpy
  * 宿主串行使用的 iOS Store，所有方法在调用线程同步执行，无后台 scope；宿主后台调用文件/Keychain I/O。
  * 沿用既有 Keychain identity，Token 不写偏好；系统暂不可访问返回空但不删除，坏 UTF-8 只清凭据。
  * 草稿/journal 在私有目录原子写入且排除备份，损坏读取报错，不重置 UNKNOWN；不持有长期文件句柄。
+ * 偏好域的开关/历史键、工作区的草稿/journal 键分别须唯一；不同存储可复用逻辑键名。
  * @param json 与既有记录兼容的序列化配置。
  * @param keychainService 原宿主 Keychain service，测试须独立命名空间。
  * @param keychainAccount 原宿主 Keychain account，勿跨品牌共用。
@@ -61,7 +62,7 @@ import platform.posix.memcpy
  * @param workspaceDirectory 专属 Application Support 绝对目录，宿主负责保留/清理记录。
  */
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-class IosBugReportStore(
+class IosBugReportStore @Throws(IllegalArgumentException::class) constructor(
     private val json: Json,
     private val keychainService: String,
     private val keychainAccount: String,
@@ -74,6 +75,11 @@ class IosBugReportStore(
     private val workspaceDirectory: String = checkNotNull((NSFileManager.defaultManager.URLsForDirectory(NSApplicationSupportDirectory, NSUserDomainMask).first() as NSURL).path) +
         "/gycrosskit-debug-tools/" + preferencesNamespace.encodeToByteArray().joinToString("") { it.toUByte().toString(16).padStart(2, '0') },
 ) : BugReportStore, BugReportWorkspaceStore {
+    init {
+        requireDistinctStoreKeys(shakeEnabledKey, historyKey)
+        requireDistinctStoreKeys(fileName(draftKey), fileName(pendingKey))
+    }
+
     override suspend fun readToken(): String = memScoped {
         val result = alloc<CFTypeRefVar>()
         val status = withKeychainQuery(includeResult = true) { SecItemCopyMatching(it, result.ptr) }

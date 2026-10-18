@@ -18,6 +18,7 @@ import javax.crypto.spec.GCMParameterSpec
  * 宿主串行使用的 Android Store，不持有 Activity；升级时保留既有命名空间/密钥 alias。
  * Token/历史/开关调用线程同步操作，偏好 apply 不保证立即落盘；宿主后台调用安全存储。
  * 工作区写入切 IO 并 commit 确认落盘，取消不保证撤销已开始的 I/O；坏 journal 不静默清空。
+ * 同一偏好域内五个数据键必须不同，避免清凭据或保存草稿覆盖防重 journal。
  * 密钥失效/坏密文只移除 Token；真实 Keystore 行为需要设备验收，不降级明文。
  * @param json 与宿主既有记录兼容的序列化配置。
  * @param preferencesName 专属私有偏好名称，不能与其他品牌共享。
@@ -39,6 +40,10 @@ class AndroidBugReportStore(
     private val draftKey: String = "bug_draft",
     private val pendingKey: String = "pending_bugs",
 ) : BugReportStore, BugReportWorkspaceStore {
+    init {
+        requireDistinctStoreKeys(tokenKey, shakeEnabledKey, historyKey, draftKey, pendingKey)
+    }
+
     private val preferences = context.applicationContext.getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
 
     override suspend fun readToken(): String {
