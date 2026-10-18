@@ -27,7 +27,7 @@ import kotlin.coroutines.resume
  * Store 实现继承接口契约，Token 不进入普通记录；页面释放前 dispose，原生 onDestroy 再清资源。
  */
 class DebugToolsModule : Module(), BugReportStore, BugReportWorkspaceStore {
-    private class Request(val id: String, val continuation: CancellableContinuation<JSONObject>, val keepAlive: Boolean) {
+    private class Request(val id: String, val continuation: CancellableContinuation<JSONObject>) {
         var callback: CallbackRef? = null
     }
     private val json = Json { ignoreUnknownKeys = true }
@@ -105,7 +105,7 @@ class DebugToolsModule : Module(), BugReportStore, BugReportWorkspaceStore {
         val dispatcher = coroutineContext[ContinuationInterceptor] as CoroutineDispatcher
         val result = withTimeout(20_000) {
             suspendCancellableCoroutine<JSONObject> { continuation ->
-                val request = Request((++nextId).toString(), continuation, keepAlive)
+                val request = Request((++nextId).toString(), continuation)
                 args.put("requestId", request.id)
                 pending.add(request)
                 if (keepAlive) shakeRequest = request
