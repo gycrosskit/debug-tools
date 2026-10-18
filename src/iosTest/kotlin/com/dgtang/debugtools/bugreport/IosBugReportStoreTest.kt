@@ -32,9 +32,28 @@ import kotlin.test.Ignore
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.test.assertFailsWith
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 class IosBugReportStoreTest {
+    @Test
+    fun `rejects keys that share preferences or workspace files`() {
+        assertFailsWith<IllegalArgumentException> {
+            IosBugReportStore(Json, "fixture-service", "fixture-account", "fixture",
+                shakeEnabledKey = "same", historyKey = "same")
+        }
+        assertFailsWith<IllegalArgumentException> {
+            IosBugReportStore(Json, "fixture-service", "fixture-account", "fixture",
+                draftKey = "same", pendingKey = "same")
+        }
+        assertFailsWith<IllegalArgumentException> {
+            IosBugReportStore(Json, "fixture-service", "fixture-account", "fixture",
+                draftKey = "\uD800", pendingKey = "\uD801")
+        }
+        IosBugReportStore(Json, "fixture-service", "fixture-account", "fixture",
+            shakeEnabledKey = "enabled", historyKey = "history", draftKey = "enabled", pendingKey = "history")
+    }
+
     @Test
     fun `reads existing history and shake keys without migration`() = runTest {
         val suite = "debug-tools-tests-${Random.nextLong()}"

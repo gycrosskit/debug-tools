@@ -42,6 +42,7 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2-1.0.0")
             implementation("io.ktor:ktor-client-mock:3.3.3-1.1.0-04")
         }
+        androidUnitTest.dependencies { implementation("org.robolectric:robolectric:4.16.1") }
     }
 }
 android {

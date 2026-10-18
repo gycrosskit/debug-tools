@@ -21,3 +21,7 @@ interface BugReportStore {
     /** 仅清 Token，不清用户开关、历史、草稿或待提交 journal。 */
     suspend fun clearCredentials()
 }
+
+internal fun requireDistinctStoreKeys(vararg keys: String) {
+    require(keys.toSet().size == keys.size) { "Debug store keys in the same storage must be distinct" }
+}
