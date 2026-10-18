@@ -42,7 +42,9 @@ jobs:
           bash .ci-shared/templates/ci-pin-fork-host.sh
       - name: Identify Native toolchain
         id: native-key
-        run: python3 scripts/ci-native-cache.py --key >> "$GITHUB_OUTPUT"
+        run: |
+          test -e scripts/ci-native-cache.py || install -m 0755 .ci-shared/templates/ci-native-cache.py scripts/ci-native-cache.py
+          python3 scripts/ci-native-cache.py --key >> "$GITHUB_OUTPUT"
       - uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: |
