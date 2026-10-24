@@ -1,5 +1,9 @@
 # 更新日志
 
+## Unreleased
+
+- Kuikly KMP 与宿主统一为 `2.29.1-2.0.21-ohos`，配套 iOS/OHOS Renderer 固定 `2.29.1`；同步配置与锁文件，后续随宿主升级。尚未发布，完整 SDK 与消费验证分别记录。
+
 ## 0.2.0-rc.7（准备中，2026-10-18）
 
 - Android/iOS Store 拒绝相同物理键的配置，避免覆盖 journal；保留 OHOS 已有判重。

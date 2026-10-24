@@ -5,7 +5,7 @@ kotlin {
     ohosArm64()
     sourceSets.commonMain.dependencies {
         api(project(":"))
-        implementation("com.tencent.kuikly-open:core:2.28.0-2.0.21-ohos")
+        implementation("com.tencent.kuikly-open:core:2.29.1-2.0.21-ohos")
     }
 }
 publishing {
