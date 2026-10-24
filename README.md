@@ -2,11 +2,11 @@
 
 当前开发分支的 Kuikly 与宿主统一：KMP 使用 `2.29.1-2.0.21-ohos`，iOS/OHOS Renderer 使用 `2.29.1`。以后随宿主同步升级；本次调整尚未发布，旧版本的接入与验收记录以对应 tag 为准。
 
-2026-10-18 Maven `0.2.0-rc.7` 准备中：增加 Android/iOS 同物理存储键判重，防止自定义键覆盖 journal；OHOS 沿用已有判重。保留原生 core、Controller、Android/iOS ViewModel 与 OHOS Kuikly Module，不提供表单 UI。归档、完整 CI 与精确公开消费待该 RC 证据；未变 HAR 保持 `0.2.0-rc.3`，没有独立 Pod/SPM，旧验收不代算本次修复。
+Maven / HAR `1.0.0` 正式候选准备中，尚未发布：增加 Android/iOS 同物理存储键判重，防止自定义键覆盖 journal；OHOS 沿用已有判重。保留原生 core、Controller、Android/iOS ViewModel 与 OHOS Kuikly Module，不提供表单 UI。归档、Jenkins 验证、精确公开消费与 HAR Registry 安装均待本轮收据；没有独立 Pod/SPM，旧验收不代算本次候选。
 
 > 2026-10-08 已发布预发行：Maven 0.2.0-rc.6。冻结归档与严格公开产物检查已通过；[精确版本 Release](https://github.com/gycrosskit/debug-tools/releases/tag/0.2.0-rc.6)、[远程消费 CI](https://github.com/gycrosskit/debug-tools/actions/runs/37769707370)分别记录产物和 Android/Native 结果。真实设备、云账号与宿主业务尚未验收。
 
-2026-10-08 功能索引：core提供Controller/REST/存储与传感器，库没有CMP/Kuikly表单UI；A/i宿主消费core，debug-tools-kuikly仅提供OHOS桥。 详见[功能与平台差异](docs/功能与平台差异.md)，含当前三端矩阵、固定历史基线与未验收范围。当前发布组合：Maven 0.2.0-rc.6；未变OHOS HAR继续0.2.0-rc.3。各渠道消费与设备验收分别核对。
+2026-10-08 功能索引：core提供Controller/REST/存储与传感器，库没有CMP/Kuikly表单UI；A/i宿主消费core，debug-tools-kuikly仅提供OHOS桥。 详见[功能与平台差异](docs/功能与平台差异.md)，含当前三端矩阵、固定历史基线与未验收范围。历史发布组合：Maven 0.2.0-rc.6；OHOS HAR 0.2.0-rc.3。本轮两渠道候选均为 1.0.0，尚未发布。各渠道消费与设备验收分别核对。
 
 Android、iOS、HarmonyOS 共用的 Bug 上报组件：草稿、提交状态、安全 Token、本机历史、摇动触发、页面轨迹、证据格式化和禅道 REST 协议。保留 `com.dgtang.debugtools.bugreport` API；表单 UI、品牌、导航和诊断采集由宿主提供。
 
@@ -116,27 +116,27 @@ classDiagram
 | 工具链 | Kotlin `2.2.21-1.0.0`、AGP 8.10.1、Gradle 8.11.1、Android JVM 11；Gradle JDK 17+ |
 | 共用依赖 | coroutines `1.10.2-1.0.0`、serialization `1.9.1-1.0.0`、Ktor `3.3.3-1.1.0-04` |
 | Android/iOS 包装 | lifecycle-viewmodel 2.10.0；OHOS 核心不依赖 AndroidX |
-| 鸿蒙桥 | Kuikly `2.28.0-2.0.21-ohos`，HAR renderer `2.28.0` |
+| 鸿蒙桥 | Kuikly `2.29.1-2.0.21-ohos`，HAR renderer `2.29.1` |
 | 原生产物 | Android AAR、iOS/OHOS KLIB、OHOS HAR；没有独立 Pod/SPM/XCFramework |
 
 三端使用 JitPack，配套依赖仓库配置见 [独立消费工程](verification-consumer/settings.gradle.kts)：
 
 ```kotlin
-implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.7")
+implementation("com.github.gycrosskit.debug-tools:debug-tools:1.0.0")
 ```
 
-三端候选坐标如下（rc.7 的 JitPack 公开产物与新目录消费待验，设备业务另验）：
+三端候选坐标如下（1.0.0 的 JitPack 公开产物与新目录消费待验，设备业务另验）：
 
 ```kotlin
 commonMain.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools:0.2.0-rc.7")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools:1.0.0")
 }
 ohosArm64Main.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:0.2.0-rc.7")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:1.0.0")
 }
 ```
 
-鸿蒙原生配套包为 `@gycrosskit/debug-tools-native@0.2.0-rc.3`。历史验收时 OHPM 已提交审核，精确版本曾 `NOTFOUND`、`next` 当时指向 rc.1；此为历史记录，不能代替当前 Registry 查询。固定归档为 [不可变 Release HAR](https://github.com/gycrosskit/debug-tools/releases/tag/0.2.0-rc.3)，SHA-256 为 `b65c2028968aa8e2b05b1032fbfdae3c66fe6d6834ebc89e72b2297b5c5da532`；不得把审核提交等同于 registry 已安装。配置、迁移键、手动恢复和生命周期例子见 [接入指南](docs/接入指南.md)；原生注册见 [HAR README](ohos/debug-tools-native/README.md)。
+鸿蒙原生候选包为 `@gycrosskit/debug-tools-native@1.0.0`，尚未发布。以下为 `0.2.0-rc.3` 的历史渠道证据。历史验收时 OHPM 已提交审核，精确版本曾 `NOTFOUND`、`next` 当时指向 rc.1；此为历史记录，不能代替当前 Registry 查询。固定归档为 [不可变 Release HAR](https://github.com/gycrosskit/debug-tools/releases/tag/0.2.0-rc.3)，SHA-256 为 `b65c2028968aa8e2b05b1032fbfdae3c66fe6d6834ebc89e72b2297b5c5da532`；不得把审核提交等同于 registry 已安装。配置、迁移键、手动恢复和生命周期例子见 [接入指南](docs/接入指南.md)；原生注册见 [HAR README](ohos/debug-tools-native/README.md)。
 
 ## 最小接入
 
@@ -164,7 +164,7 @@ bash gradlew --no-daemon --max-workers=1 --no-parallel \
   jvmTest testDebugUnitTest iosSimulatorArm64Test \
   compileKotlinIosArm64 compileKotlinIosX64 \
   :debug-tools-kuikly:compileKotlinOhosArm64 publishAllPublicationsToStagingRepository
-VERSION=0.2.0-rc.7 bash scripts/package-maven.sh
+VERSION=1.0.0 bash scripts/package-maven.sh
 ```
 
 staging 位于 `build/maven/<版本>`，不用 mavenLocal。候选输出位于 `build/release/<版本>/`，包含 Maven 归档、`SHA256SUMS` 和 `source-receipt.json`；完整 9 个 publications 检查通过后才归档。`export-maven.sh` 沿用同一入口。`verification-consumer` 默认从 JitPack 精确坐标消费；候选可通过外置临时 init script 只替换本组件 group 为 staging。源码、公开消费和设备验收分别记录。
