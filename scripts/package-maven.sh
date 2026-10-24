@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
-: "${VERSION:?Provide the immutable RC version}"
-[[ "$VERSION" =~ ^[0-9][0-9A-Za-z._-]*-rc\.[0-9]+$ ]] || { echo 'Expected an immutable RC version' >&2; exit 1; }
+: "${VERSION:?Provide the immutable stable SemVer or RC version}"
+[[ "$VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-rc\.(0|[1-9][0-9]*))?$ ]] || { echo 'Expected an immutable stable SemVer or RC version' >&2; exit 1; }
 repository="debug-tools"
 staging="build/maven/$VERSION"
 output="build/release/$VERSION"
