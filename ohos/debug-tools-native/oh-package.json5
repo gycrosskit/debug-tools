@@ -1,6 +1,6 @@
 {
   "name": "@gycrosskit/debug-tools-native",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "HarmonyOS HUKS Bug Token store, draft persistence and shake detector with Kuikly bridge",
   "main": "Index.ets",
   "author": {

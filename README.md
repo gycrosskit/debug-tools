@@ -1,8 +1,10 @@
 # GY CrossKit Debug Tools
 
+2026-10-25 当前候选为 Maven、已有 Native/Harmony 渠道配套 `1.0.1`；保留已存在的 `1.0.0` 标签与原摘要。下述带日期的 `1.0.0` 准备记录属于历史，本轮源码、归档和公开消费须重新验收，尚未宣称已发布。
+
 当前开发分支的 Kuikly 与宿主统一：KMP 使用 `2.29.1-2.0.21-ohos`，iOS/OHOS Renderer 使用 `2.29.1`。以后随宿主同步升级；本次调整尚未发布，旧版本的接入与验收记录以对应 tag 为准。
 
-Maven / HAR `1.0.0` 正式候选准备中，尚未发布：增加 Android/iOS 同物理存储键判重，防止自定义键覆盖 journal；OHOS 沿用已有判重。保留原生 core、Controller、Android/iOS ViewModel 与 OHOS Kuikly Module，不提供表单 UI。归档、Jenkins 验证、精确公开消费与 HAR Registry 安装均待本轮收据；没有独立 Pod/SPM，旧验收不代算本次候选。
+Maven / HAR `1.0.1` 正式候选准备中，尚未发布：增加 Android/iOS 同物理存储键判重，防止自定义键覆盖 journal；OHOS 沿用已有判重。保留原生 core、Controller、Android/iOS ViewModel 与 OHOS Kuikly Module，不提供表单 UI。归档、Jenkins 验证、精确公开消费与 HAR Registry 安装均待本轮收据；没有独立 Pod/SPM，旧验收不代算本次候选。
 
 > 2026-10-08 已发布预发行：Maven 0.2.0-rc.6。冻结归档与严格公开产物检查已通过；[精确版本 Release](https://github.com/gycrosskit/debug-tools/releases/tag/0.2.0-rc.6)、[远程消费 CI](https://github.com/gycrosskit/debug-tools/actions/runs/37769707370)分别记录产物和 Android/Native 结果。真实设备、云账号与宿主业务尚未验收。
 
@@ -122,21 +124,21 @@ classDiagram
 三端使用 JitPack，配套依赖仓库配置见 [独立消费工程](verification-consumer/settings.gradle.kts)：
 
 ```kotlin
-implementation("com.github.gycrosskit.debug-tools:debug-tools:1.0.0")
+implementation("com.github.gycrosskit.debug-tools:debug-tools:1.0.1")
 ```
 
-三端候选坐标如下（1.0.0 的 JitPack 公开产物与新目录消费待验，设备业务另验）：
+三端候选坐标如下（1.0.1 的 JitPack 公开产物与新目录消费待验，设备业务另验）：
 
 ```kotlin
 commonMain.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools:1.0.0")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools:1.0.1")
 }
 ohosArm64Main.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:1.0.0")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:1.0.1")
 }
 ```
 
-鸿蒙原生候选包为 `@gycrosskit/debug-tools-native@1.0.0`，尚未发布。以下为 `0.2.0-rc.3` 的历史渠道证据。历史验收时 OHPM 已提交审核，精确版本曾 `NOTFOUND`、`next` 当时指向 rc.1；此为历史记录，不能代替当前 Registry 查询。固定归档为 [不可变 Release HAR](https://github.com/gycrosskit/debug-tools/releases/tag/0.2.0-rc.3)，SHA-256 为 `b65c2028968aa8e2b05b1032fbfdae3c66fe6d6834ebc89e72b2297b5c5da532`；不得把审核提交等同于 registry 已安装。配置、迁移键、手动恢复和生命周期例子见 [接入指南](docs/接入指南.md)；原生注册见 [HAR README](ohos/debug-tools-native/README.md)。
+鸿蒙原生候选包为 `@gycrosskit/debug-tools-native@1.0.1`，尚未发布。以下为 `0.2.0-rc.3` 的历史渠道证据。历史验收时 OHPM 已提交审核，精确版本曾 `NOTFOUND`、`next` 当时指向 rc.1；此为历史记录，不能代替当前 Registry 查询。固定归档为 [不可变 Release HAR](https://github.com/gycrosskit/debug-tools/releases/tag/0.2.0-rc.3)，SHA-256 为 `b65c2028968aa8e2b05b1032fbfdae3c66fe6d6834ebc89e72b2297b5c5da532`；不得把审核提交等同于 registry 已安装。配置、迁移键、手动恢复和生命周期例子见 [接入指南](docs/接入指南.md)；原生注册见 [HAR README](ohos/debug-tools-native/README.md)。
 
 ## 最小接入
 
@@ -164,7 +166,7 @@ bash gradlew --no-daemon --max-workers=1 --no-parallel \
   jvmTest testDebugUnitTest iosSimulatorArm64Test \
   compileKotlinIosArm64 compileKotlinIosX64 \
   :debug-tools-kuikly:compileKotlinOhosArm64 publishAllPublicationsToStagingRepository
-VERSION=1.0.0 bash scripts/package-maven.sh
+VERSION=1.0.1 bash scripts/package-maven.sh
 ```
 
 staging 位于 `build/maven/<版本>`，不用 mavenLocal。候选输出位于 `build/release/<版本>/`，包含 Maven 归档、`SHA256SUMS` 和 `source-receipt.json`；完整 9 个 publications 检查通过后才归档。`export-maven.sh` 沿用同一入口。`verification-consumer` 默认从 JitPack 精确坐标消费；候选可通过外置临时 init script 只替换本组件 group 为 staging。源码、公开消费和设备验收分别记录。

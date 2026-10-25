@@ -12,11 +12,11 @@ kotlin {
     iosSimulatorArm64 { binaries.framework { baseName = "DebugToolsConsumer" } }
     sourceSets {
       ohosArm64Main.dependencies {
-        implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:${providers.gradleProperty("debugToolsVersion").orElse("1.0.0").get()}")
+        implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:${providers.gradleProperty("debugToolsVersion").orElse("1.0.1").get()}")
       }
     }
     sourceSets.commonMain.dependencies {
-        implementation("com.github.gycrosskit.debug-tools:debug-tools:${providers.gradleProperty("debugToolsVersion").orElse("1.0.0").get()}")
+        implementation("com.github.gycrosskit.debug-tools:debug-tools:${providers.gradleProperty("debugToolsVersion").orElse("1.0.1").get()}")
     }
 }
 android {
