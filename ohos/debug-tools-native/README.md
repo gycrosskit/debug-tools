@@ -1,6 +1,6 @@
 # GY CrossKit 鸿蒙 Debug Tools
 
-本轮 Maven / HAR 正式候选均为 `1.0.0`，尚未发布。候选安装命令：`ohpm install @gycrosskit/debug-tools-native@1.0.0`；Jenkins、Release 消费与 OHPM Registry 安装结果分别记录，历史渠道状态见仓库根 README。模块职责、五入口与验证范围见[功能与平台差异](../../docs/功能与平台差异.md)。
+本轮 Maven / HAR 正式候选均为 `1.0.1`，尚未发布。候选安装命令：`ohpm install @gycrosskit/debug-tools-native@1.0.1`；Jenkins、Release 消费与 OHPM Registry 安装结果分别记录，历史渠道状态见仓库根 README。模块职责、五入口与验证范围见[功能与平台差异](../../docs/功能与平台差异.md)。
 
 将 `GycDebugToolsModule.MODULE_NAME` 注册到 Kuikly renderer；每页持有对应 Module。宿主声明 `ohos.permission.ACCELEROMETER`，在允许调试工具的生命周期内启动/停止摇动。
 
