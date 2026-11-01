@@ -6,7 +6,7 @@ plugins {
 }
 
 group = providers.environmentVariable("GROUP").orElse("com.github.gycrosskit.debug-tools").get()
-version = providers.environmentVariable("VERSION").orElse("1.0.1").get()
+version = providers.environmentVariable("VERSION").orElse("1.0.2").get()
 
 kotlin {
     androidTarget {
@@ -42,7 +42,12 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2-1.0.0")
             implementation("io.ktor:ktor-client-mock:3.3.3-1.1.0-04")
         }
-        androidUnitTest.dependencies { implementation("org.robolectric:robolectric:4.16.1") }
+        // 同一 sender 源码参与现有 Android unit 门禁，避免独立轻量入口脱离回归。
+        androidUnitTest.get().kotlin.srcDir("debug-tools-kuikly/src/commonMain/kotlin")
+        androidUnitTest.dependencies {
+            implementation("org.robolectric:robolectric:4.16.1")
+            implementation("com.tencent.kuikly-open:core:2.29.1-2.0.21-ohos")
+        }
     }
 }
 android {
