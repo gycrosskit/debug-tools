@@ -2,6 +2,7 @@ package com.dgtang.debugtools.kuikly
 
 import com.dgtang.debugtools.bugreport.*
 import com.dgtang.debugtools.shake.ShakeStartResult
+import com.tencent.kuikly.core.global.GlobalFunctions
 import com.tencent.kuikly.core.module.CallbackRef
 import com.tencent.kuikly.core.module.Module
 import com.tencent.kuikly.core.nvi.serialization.json.JSONObject
@@ -20,6 +21,7 @@ import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * 每页一个 Module；所有方法/所属协程都在同一 Kuikly Context，不能从其他 Page 并发访问 callback 表。
@@ -115,21 +117,35 @@ class DebugToolsModule : Module(), BugReportStore, BugReportWorkspaceStore {
                         pending.remove(request)
                         request.callback?.let(::removeCallback); request.callback = null
                         if (shakeRequest === request) { shakeRequest = null; shakeStarted = false }
-                        if (!disposed) asyncToNativeMethod("cancel", JSONObject().apply { put("requestId", request.id) }, null)
+                        if (!disposed) runCatching {
+                            asyncToNativeMethod("cancel", JSONObject().apply { put("requestId", request.id) }, null)
+                        }
                     }
                 }
-                request.callback = toNative(keepAlive, method, args.toString(), { response ->
-                    if (disposed || response == null) return@toNative
-                    if (response.optString("status") == "shake") {
-                        if (shakeStarted && shakeRequest === request) mutableShakes.tryEmit(Unit)
-                    } else {
-                        pending.remove(request)
-                        if (continuation.isActive) continuation.resume(response)
-                        if (!keepAlive) { request.callback?.let(::removeCallback); request.callback = null }
+                try {
+                    // 2.29.1 先注册回调再调用 native，预存 ref 才能清理同步桥异常。
+                    request.callback = GlobalFunctions.peekNextRef().toString()
+                    request.callback = toNative(keepAlive, method, args.toString(), { response ->
+                        if (disposed || response == null) return@toNative
+                        if (response.optString("status") == "shake") {
+                            if (shakeStarted && shakeRequest === request) mutableShakes.tryEmit(Unit)
+                        } else {
+                            pending.remove(request)
+                            if (continuation.isActive) continuation.resume(response)
+                            if (!keepAlive) { request.callback?.let(::removeCallback); request.callback = null }
+                        }
+                    }, false).callbackRef
+                    if (!continuation.isActive && !keepAlive) {
+                        request.callback?.let(::removeCallback); request.callback = null
                     }
-                }, false).callbackRef
-                if (!continuation.isActive && !keepAlive) {
-                    request.callback?.let(::removeCallback); request.callback = null
+                } catch (error: Exception) {
+                    // 同步回执已结算时沿用其结果，不能误删已成功注册的持续摇动回调。
+                    if (continuation.isActive) {
+                        pending.remove(request)
+                        request.callback?.let(::removeCallback); request.callback = null
+                        if (shakeRequest === request) { shakeRequest = null; shakeStarted = false }
+                        continuation.resumeWithException(error)
+                    }
                 }
             }
         }
@@ -149,15 +165,19 @@ class DebugToolsModule : Module(), BugReportStore, BugReportWorkspaceStore {
     /** 同 Context 幂等撤回持续回调、取消待完成请求并通知原生停摇动；此实例不可再使用。 */
     fun dispose() {
         if (disposed) return
-        clearShake()
-        // 原生 onDestroy 也会 close；提前取消当前传感器，撤销仍等待的 Store 回执。
-        asyncToNativeMethod("stopShake", JSONObject().apply { put("requestId", (++nextId).toString()) }, null)
-        pending.forEach { request ->
-            asyncToNativeMethod("cancel", JSONObject().apply { put("requestId", request.id) }, null)
-        }
         disposed = true
-        pending.toList().forEach { it.continuation.cancel() }
+        clearShake()
+        val closing = pending.toList()
         pending.clear()
+        closing.forEach { request ->
+            request.callback?.let(::removeCallback); request.callback = null
+            request.continuation.cancel()
+        }
+        // native 可能已关闭；控制调用失败不能阻断本地终态及其余请求的清理。
+        runCatching { asyncToNativeMethod("stopShake", JSONObject().apply { put("requestId", (++nextId).toString()) }, null) }
+        closing.forEach { request ->
+            runCatching { asyncToNativeMethod("cancel", JSONObject().apply { put("requestId", request.id) }, null) }
+        }
     }
     companion object {
         /** 与原生 Module 注册名一致，宿主不能改名仅注册一端。 */
