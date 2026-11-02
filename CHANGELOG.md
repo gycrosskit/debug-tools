@@ -1,5 +1,11 @@
 # 更新日志
 
+## 1.0.3（HAR 候选）
+
+- 补齐包内当前版本更新记录，修复 OHPM 提交时缺少当前版本 CHANGELOG 的拒绝。
+- 延续上一版组件能力及宿主可选的 Kuikly Renderer 范围；API、厂商依赖与生命周期行为不变。
+- 使用新不可变 HAR 版本，不覆盖旧标签或制品；构建、公开消费、审核与 Registry 安装分别验收，当前尚未发布。
+
 ## 1.0.2（Maven / HAR）
 
 - Kuikly sender 补齐同步回执、取消与 dispose 后清理，保留 journal、凭据 namespace 和不自动重发合同。
