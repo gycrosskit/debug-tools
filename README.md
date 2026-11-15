@@ -1,6 +1,6 @@
 # GY CrossKit Debug Tools
 
-当前已发布渠道：Maven [`1.0.2`](https://github.com/gycrosskit/debug-tools/releases/tag/1.0.2)、HAR/OHPM [`1.0.3`](https://github.com/gycrosskit/debug-tools/releases/tag/har-1.0.3)，没有独立 Pod/SPM。本轮只准备 Maven `1.0.3` 候选，与现有 HAR 版本对齐；候选尚未发布，不覆盖旧标签、归档或摘要。发布和精确消费分别以本轮收据为准。
+当前已发布 Maven [`1.0.3`](https://github.com/gycrosskit/debug-tools/releases/tag/1.0.3) 与 HAR/OHPM [`1.0.3`](https://github.com/gycrosskit/debug-tools/releases/tag/har-1.0.3)，没有独立 Pod/SPM。Maven 本轮只对齐版本，生产实现和既有 HAR 不变；历史标签、归档及摘要保留。精确公开产物已核对，公开消费者编译尚待[独立验收](http://121.36.107.201:18080/job/component-ci/job/verify/202/)，不能据发布推断设备或宿主业务通过。
 
 Kuikly 由宿主统一选择版本；组件构建基线、允许范围及消费验证边界见[功能与平台差异](docs/功能与平台差异.md#kuikly-版本与宿主选择)。保留原生 core、Controller、Android/iOS ViewModel 与 OHOS Kuikly Module，不提供表单 UI。历史版本和验收见[版本记录](docs/版本记录.md)与[开发与验证](docs/开发与验证.md)，不代算候选、设备或宿主业务验收。
 
@@ -113,13 +113,13 @@ classDiagram
 | 鸿蒙桥 | Kuikly `2.29.1-2.0.21-ohos`，HAR renderer `2.29.1` |
 | 原生产物 | Android AAR、iOS/OHOS KLIB、OHOS HAR；没有独立 Pod/SPM/XCFramework |
 
-三端使用 JitPack，以下候选坐标发布后方可远程消费；配套依赖仓库配置见 [独立消费工程](verification-consumer/settings.gradle.kts)：
+三端使用 JitPack，以下为精确已发布坐标；配套依赖仓库配置见 [独立消费工程](verification-consumer/settings.gradle.kts)：
 
 ```kotlin
 implementation("com.github.gycrosskit.debug-tools:debug-tools:1.0.3")
 ```
 
-以下为 Maven `1.0.3` 未发布候选坐标；公开产物、新目录消费与设备业务分别验收：
+以下为 Maven `1.0.3` 已发布坐标；公开产物、新目录消费与设备业务分别验收：
 
 ```kotlin
 commonMain.dependencies {
