@@ -1,20 +1,12 @@
 # GY CrossKit Debug Tools
 
-当前渠道版本：Maven 为 [`1.0.2`](https://github.com/gycrosskit/debug-tools/releases/tag/1.0.2)、HAR 为已发布的 [`1.0.3`](https://github.com/gycrosskit/debug-tools/releases/tag/har-1.0.3)，没有独立 Pod/SPM。实际发布和消费状态以精确 Release/Registry 收据为准；历史标签、摘要与带日期的验收记录保持原范围。
+当前已发布渠道：Maven [`1.0.2`](https://github.com/gycrosskit/debug-tools/releases/tag/1.0.2)、HAR/OHPM [`1.0.3`](https://github.com/gycrosskit/debug-tools/releases/tag/har-1.0.3)，没有独立 Pod/SPM。本轮只准备 Maven `1.0.3` 候选，与现有 HAR 版本对齐；候选尚未发布，不覆盖旧标签、归档或摘要。发布和精确消费分别以本轮收据为准。
 
-Kuikly 由宿主统一选择版本；组件构建基线、允许范围及消费验证边界见[功能与平台差异](docs/功能与平台差异.md#kuikly-版本与宿主选择)。 各渠道状态以精确发布记录为准，旧版本的接入与验收记录以对应 tag 为准。
-
-当前 Maven 为 `1.0.2`、HAR 为 `1.0.3`；当前源码增加 Android/iOS 同物理存储键判重，防止自定义键覆盖 journal；OHOS 沿用已有判重。保留原生 core、Controller、Android/iOS ViewModel 与 OHOS Kuikly Module，不提供表单 UI。归档、Jenkins 验证、精确公开消费与 HAR Registry 安装分别以对应收据为准；没有独立 Pod/SPM，旧验收不代算当前版本的渠道消费。
-
-> 2026-10-08 已发布预发行：Maven 0.2.0-rc.6。冻结归档与严格公开产物检查已通过；[精确版本 Release](https://github.com/gycrosskit/debug-tools/releases/tag/0.2.0-rc.6)、[远程消费 CI](https://github.com/gycrosskit/debug-tools/actions/runs/37769707370)分别记录产物和 Android/Native 结果。真实设备、云账号与宿主业务尚未验收。
-
-2026-10-08 功能索引：core提供Controller/REST/存储与传感器，库没有CMP/Kuikly表单UI；A/i宿主消费core，debug-tools-kuikly仅提供OHOS桥。 详见[功能与平台差异](docs/功能与平台差异.md)，含当前三端矩阵、固定历史基线与未验收范围。历史发布组合：Maven 0.2.0-rc.6；OHOS HAR 0.2.0-rc.3。本轮两渠道候选均为 1.0.0，尚未发布。各渠道消费与设备验收分别核对。
+Kuikly 由宿主统一选择版本；组件构建基线、允许范围及消费验证边界见[功能与平台差异](docs/功能与平台差异.md#kuikly-版本与宿主选择)。保留原生 core、Controller、Android/iOS ViewModel 与 OHOS Kuikly Module，不提供表单 UI。历史版本和验收见[版本记录](docs/版本记录.md)与[开发与验证](docs/开发与验证.md)，不代算候选、设备或宿主业务验收。
 
 Android、iOS、HarmonyOS 共用的 Bug 上报组件：草稿、提交状态、安全 Token、本机历史、摇动触发、页面轨迹、证据格式化和禅道 REST 协议。保留 `com.dgtang.debugtools.bugreport` API；表单 UI、品牌、导航和诊断采集由宿主提供。
 
-历史预发布 Maven **0.2.0-rc.3**（`debug-tools` / `debug-tools-kuikly`）与 Release HAR **0.2.0-rc.3**：初始恢复期间阻止旧快照覆盖新凭据操作，鸿蒙桥严格拒绝 null 和错误参数类型。新标签Release/JitPack文件与新目录Maven实际消费已通过，OHPM仍审核、Release HAR fallback消费已通过，结果见 [完整审查](docs/完整审查.md)；后面的 rc.1/rc.2 为历史验收。
-
-历史已发布基线 Maven 为 `0.2.0-rc.6`，HAR 保持 `0.2.0-rc.3`；以上 rc.3 为历史说明。rc.6 已将 iOS 摇动冷却改为 CoreMotion 采样的单调时间戳，与 Android/OHOS 同样不受系统时间调整影响；阈值、冷却时长与生命周期保持原合同。
+早期 RC 的防恢复覆盖、原生桥参数校验、iOS 单调摇动时间修复与对应渠道验收见[完整审查](docs/完整审查.md)和[开发与验证](docs/开发与验证.md)；历史 OHPM 审核状态不代表当前 Registry 状态。
 
 ## 本版对齐范围
 
@@ -115,26 +107,26 @@ classDiagram
 | 项目 | 当前范围 |
 | --- | --- |
 | 平台 | Android minSdk 24、iOS Arm64/Simulator Arm64/x64、OHOS Arm64；JVM 用于共用核心消费和测试 |
-| 工具链 | Kotlin `2.2.21-1.0.0`、AGP 8.10.1、Gradle 8.11.1、Android JVM 11；Gradle JDK 17+ |
+| 工具链 | Kotlin `2.2.21-1.0.0`、AGP 8.10.1、Gradle 8.11.1、Android JVM 11；Gradle JDK 21 |
 | 共用依赖 | coroutines `1.10.2-1.0.0`、serialization `1.9.1-1.0.0`、Ktor `3.3.3-1.1.0-04` |
 | Android/iOS 包装 | lifecycle-viewmodel 2.10.0；OHOS 核心不依赖 AndroidX |
 | 鸿蒙桥 | Kuikly `2.29.1-2.0.21-ohos`，HAR renderer `2.29.1` |
 | 原生产物 | Android AAR、iOS/OHOS KLIB、OHOS HAR；没有独立 Pod/SPM/XCFramework |
 
-三端使用 JitPack，配套依赖仓库配置见 [独立消费工程](verification-consumer/settings.gradle.kts)：
+三端使用 JitPack，以下候选坐标发布后方可远程消费；配套依赖仓库配置见 [独立消费工程](verification-consumer/settings.gradle.kts)：
 
 ```kotlin
-implementation("com.github.gycrosskit.debug-tools:debug-tools:1.0.2")
+implementation("com.github.gycrosskit.debug-tools:debug-tools:1.0.3")
 ```
 
-三端坐标如下（公开产物与新目录消费以 1.0.2 精确版本收据为准，设备业务另验）：
+以下为 Maven `1.0.3` 未发布候选坐标；公开产物、新目录消费与设备业务分别验收：
 
 ```kotlin
 commonMain.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools:1.0.2")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools:1.0.3")
 }
 ohosArm64Main.dependencies {
-    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:1.0.2")
+    implementation("com.github.gycrosskit.debug-tools:debug-tools-kuikly:1.0.3")
 }
 ```
 
@@ -166,7 +158,7 @@ bash gradlew --no-daemon --max-workers=1 --no-parallel \
   jvmTest testDebugUnitTest iosSimulatorArm64Test \
   compileKotlinIosArm64 compileKotlinIosX64 \
   :debug-tools-kuikly:compileKotlinOhosArm64 publishAllPublicationsToStagingRepository
-VERSION=1.0.2 bash scripts/package-maven.sh
+VERSION=1.0.3 bash scripts/package-maven.sh
 ```
 
 staging 位于 `build/maven/<版本>`，不用 mavenLocal。候选输出位于 `build/release/<版本>/`，包含 Maven 归档、`SHA256SUMS` 和 `source-receipt.json`；完整 9 个 publications 检查通过后才归档。`export-maven.sh` 沿用同一入口。`verification-consumer` 默认从 JitPack 精确坐标消费；候选可通过外置临时 init script 只替换本组件 group 为 staging。源码、公开消费和设备验收分别记录。
