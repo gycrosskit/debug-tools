@@ -1,6 +1,8 @@
 # GY CrossKit Debug Tools
 
-当前已发布 Maven [`1.0.3`](https://github.com/gycrosskit/debug-tools/releases/tag/1.0.3) 与 HAR/OHPM [`1.0.3`](https://github.com/gycrosskit/debug-tools/releases/tag/har-1.0.3)，没有独立 Pod/SPM。Maven 本轮只对齐版本，生产实现和既有 HAR 不变；历史标签、归档及摘要保留。精确公开产物已核对，[独立远程消费者验收](http://121.36.107.201:18080/job/component-ci/job/verify/202/)已通过 Android 编译、iOS 三架构编译/Simulator Framework 链接和 OHOS 编译，不能据发布推断设备或宿主业务通过。
+新版 Maven 发布由 Jenkins 生成同版本归档、`source-receipt.json` 和 `SHA256SUMS`。JitPack 核对标签来源、归档尺寸和摘要后安装同一份制品。历史发布按原版本 Tag 复验。
+
+当前已发布 Maven [`1.0.3`](https://github.com/gycrosskit/debug-tools/releases/tag/1.0.3) 与私有 OHPM `1.0.3`，没有独立 Pod/SPM。Maven 本轮只对齐版本，生产实现和既有 HAR 不变；历史标签、归档及摘要保留。精确公开产物已核对，[独立远程消费者验收](http://121.36.107.201:18080/job/component-ci/job/verify/202/)已通过 Android 编译、iOS 三架构编译/Simulator Framework 链接和 OHOS 编译，不能据发布推断设备或宿主业务通过。
 
 Kuikly 由宿主统一选择版本；组件构建基线、允许范围及消费验证边界见[功能与平台差异](docs/功能与平台差异.md#kuikly-版本与宿主选择)。保留原生 core、Controller、Android/iOS ViewModel 与 OHOS Kuikly Module，不提供表单 UI。历史版本和验收见[版本记录](docs/版本记录.md)与[开发与验证](docs/开发与验证.md)，不代算候选、设备或宿主业务验收。
 
