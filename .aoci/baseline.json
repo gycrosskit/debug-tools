@@ -1,0 +1,656 @@
+{
+  "version": 1,
+  "created_at": "2026-11-19T08:49:24Z",
+  "updated_at": "2026-11-19T09:05:39Z",
+  "files": {
+    ".gitattributes": {
+      "role": "index",
+      "sha256": "21fa16a2122e2b0360b47502c577428b645437e08e9e87ffba661f84853cb476",
+      "size": 291,
+      "normalized_sha256": "21fa16a2122e2b0360b47502c577428b645437e08e9e87ffba661f84853cb476"
+    },
+    ".gitignore": {
+      "role": "index",
+      "sha256": "9f4e32caf4b0a6041113a1dded4d7238e4a7562b72afe5859dff5a47065497f3",
+      "size": 295,
+      "normalized_sha256": "9f4e32caf4b0a6041113a1dded4d7238e4a7562b72afe5859dff5a47065497f3"
+    },
+    "AGENTS.md": {
+      "role": "index",
+      "sha256": "6f741b632ac3751785cfa1ed8bdbc2dbc8f4d4881ef2c4507cd1a92718a33030",
+      "size": 14786,
+      "normalized_sha256": "6f741b632ac3751785cfa1ed8bdbc2dbc8f4d4881ef2c4507cd1a92718a33030"
+    },
+    "CHANGELOG.md": {
+      "role": "index",
+      "sha256": "1d9c3b7d6e382b228e6ef694c606718694022a4611c1aa41ff46ff6001a05212",
+      "size": 2491,
+      "normalized_sha256": "1d9c3b7d6e382b228e6ef694c606718694022a4611c1aa41ff46ff6001a05212"
+    },
+    "LICENSE": {
+      "role": "index",
+      "sha256": "c69e86da3fc2081768d5839c99bf63ee397a308f78e6f61cd2babc530a36f9cc",
+      "size": 11356,
+      "normalized_sha256": "c69e86da3fc2081768d5839c99bf63ee397a308f78e6f61cd2babc530a36f9cc"
+    },
+    "README.md": {
+      "role": "index",
+      "sha256": "a219c033c51c8b4c169dc2e54d2b4d5cfdc9a02d889222d9a4a04eb04a8bda5e",
+      "size": 11776,
+      "normalized_sha256": "a219c033c51c8b4c169dc2e54d2b4d5cfdc9a02d889222d9a4a04eb04a8bda5e"
+    },
+    "SHA256SUMS": {
+      "role": "index",
+      "sha256": "97546a5ce18470b77cc13892bbafe3cea7bf9f1b524c4d6df8d06f7b5a1f2621",
+      "size": 91,
+      "normalized_sha256": "97546a5ce18470b77cc13892bbafe3cea7bf9f1b524c4d6df8d06f7b5a1f2621"
+    },
+    "aoci.code.txt": {
+      "role": "index",
+      "sha256": "a5f3e07c66e3f7fc0ad6dfd045dd7533c3f15b7e6cc568eca9391079dea3f7a0",
+      "size": 28796,
+      "normalized_sha256": "a5f3e07c66e3f7fc0ad6dfd045dd7533c3f15b7e6cc568eca9391079dea3f7a0"
+    },
+    "aoci.meta.txt": {
+      "role": "index",
+      "sha256": "fbc304fa05182547e96f1f8404c7c30ad6c366bba9589523f1019c2c1da0427c",
+      "size": 1989,
+      "normalized_sha256": "fbc304fa05182547e96f1f8404c7c30ad6c366bba9589523f1019c2c1da0427c"
+    },
+    "aoci.txt": {
+      "role": "index",
+      "sha256": "53903953d45ac5e1b6b3a4440483ba4fb0cf55991c2161946e68e33c8af15215",
+      "size": 300,
+      "normalized_sha256": "53903953d45ac5e1b6b3a4440483ba4fb0cf55991c2161946e68e33c8af15215"
+    },
+    "build.gradle.kts": {
+      "role": "index",
+      "sha256": "6b412915650663ea6c14c9b202b45a0ac8550b5e71c492e05bf4fa8d15e7c4d9",
+      "size": 3587,
+      "normalized_sha256": "6b412915650663ea6c14c9b202b45a0ac8550b5e71c492e05bf4fa8d15e7c4d9"
+    },
+    "debug-tools-kuikly/build.gradle.kts": {
+      "role": "index",
+      "sha256": "2db46991f5c556620e7f6abfcd6e2a3314a58355029baa5517e598e82321b2bd",
+      "size": 852,
+      "normalized_sha256": "2db46991f5c556620e7f6abfcd6e2a3314a58355029baa5517e598e82321b2bd"
+    },
+    "debug-tools-kuikly/src/commonMain/kotlin/com/dgtang/debugtools/kuikly/DebugToolsModule.kt": {
+      "role": "index",
+      "sha256": "b4ce120a6ef82409930062287f8663bde9bdce34616329ce950838e3de3bd5f1",
+      "size": 10169,
+      "normalized_sha256": "b4ce120a6ef82409930062287f8663bde9bdce34616329ce950838e3de3bd5f1"
+    },
+    "docs/功能与平台差异.md": {
+      "role": "index",
+      "sha256": "a3da7689619968b855f73bbb42380fe8d485e9be816f9c30d207f7b91e5c8751",
+      "size": 14653,
+      "normalized_sha256": "a3da7689619968b855f73bbb42380fe8d485e9be816f9c30d207f7b91e5c8751"
+    },
+    "docs/完整审查.md": {
+      "role": "index",
+      "sha256": "f268b1253028f770d925c98982cd04b64502b45662ea322ec266c2bd52abe381",
+      "size": 6114,
+      "normalized_sha256": "f268b1253028f770d925c98982cd04b64502b45662ea322ec266c2bd52abe381"
+    },
+    "docs/开发与验证.md": {
+      "role": "index",
+      "sha256": "75d64cc35231100e07324ed0211a104d5997ed9cb53a8aa7aa1c91c026ee74fe",
+      "size": 24745,
+      "normalized_sha256": "75d64cc35231100e07324ed0211a104d5997ed9cb53a8aa7aa1c91c026ee74fe"
+    },
+    "docs/接入指南.md": {
+      "role": "index",
+      "sha256": "c6652f49ba48bb5470f5bb3472bfd0c239acd0d8580711e327a4f3da4e551f79",
+      "size": 9239,
+      "normalized_sha256": "c6652f49ba48bb5470f5bb3472bfd0c239acd0d8580711e327a4f3da4e551f79"
+    },
+    "docs/版本记录.md": {
+      "role": "index",
+      "sha256": "bdfc6c43bb55ba37049a6287b5f86e4c2056cac8400d7b8a4ebc4fd972240b7f",
+      "size": 4949,
+      "normalized_sha256": "bdfc6c43bb55ba37049a6287b5f86e4c2056cac8400d7b8a4ebc4fd972240b7f"
+    },
+    "gradle.properties": {
+      "role": "index",
+      "sha256": "f36eb4825f12cb1892b70c34ecf6e2b2b0d1953f6bc87c63936ebea5795d21ac",
+      "size": 103,
+      "normalized_sha256": "f36eb4825f12cb1892b70c34ecf6e2b2b0d1953f6bc87c63936ebea5795d21ac"
+    },
+    "gradle/native-toolchain.properties": {
+      "role": "index",
+      "sha256": "ca6881c69ac4b9eefa1654e378ac43f080d73e0ed853efcfc965c28b0a71ec9d",
+      "size": 88,
+      "normalized_sha256": "ca6881c69ac4b9eefa1654e378ac43f080d73e0ed853efcfc965c28b0a71ec9d"
+    },
+    "gradle/wrapper/gradle-wrapper.jar": {
+      "role": "index",
+      "sha256": "e996d452d2645e70c01c11143ca2d3742734a28da2bf61f25c82bdc288c9e637",
+      "size": 59203
+    },
+    "gradle/wrapper/gradle-wrapper.properties": {
+      "role": "index",
+      "sha256": "5c7eebdc75ff060f7ece6eaf8ff7561996dd77462498a459de486b246f222837",
+      "size": 320,
+      "normalized_sha256": "5c7eebdc75ff060f7ece6eaf8ff7561996dd77462498a459de486b246f222837"
+    },
+    "gradlew": {
+      "role": "index",
+      "sha256": "63135287117a1e6d12c84580f1f49c61d1ba02218ecd28660605e97f976e7d65",
+      "size": 5766,
+      "normalized_sha256": "63135287117a1e6d12c84580f1f49c61d1ba02218ecd28660605e97f976e7d65"
+    },
+    "gradlew.bat": {
+      "role": "index",
+      "sha256": "c46a27c79007746de5922b17abb6230d64ad8b1ba3ad1585ee5c6543c2a9b129",
+      "size": 2674,
+      "normalized_sha256": "c46a27c79007746de5922b17abb6230d64ad8b1ba3ad1585ee5c6543c2a9b129"
+    },
+    "jitpack-install.sh": {
+      "role": "index",
+      "sha256": "68d6af4d63edfb1e01eb61f49ed2ed4bb094978875a29238d29bf3ad1cc80315",
+      "size": 4709,
+      "normalized_sha256": "68d6af4d63edfb1e01eb61f49ed2ed4bb094978875a29238d29bf3ad1cc80315"
+    },
+    "jitpack.yml": {
+      "role": "index",
+      "sha256": "b77e187a1f35d1bba32939f2fb5418b0b57fa88b11fbcdab260d1ffccee09cc9",
+      "size": 68,
+      "normalized_sha256": "b77e187a1f35d1bba32939f2fb5418b0b57fa88b11fbcdab260d1ffccee09cc9"
+    },
+    "ohos/AppScope/app.json5": {
+      "role": "index",
+      "sha256": "3c67544bf8bf4a9e448d1941ff16c77ac034973d23c516b9d310a839b26e3d53",
+      "size": 217,
+      "normalized_sha256": "3c67544bf8bf4a9e448d1941ff16c77ac034973d23c516b9d310a839b26e3d53"
+    },
+    "ohos/build-profile.json5": {
+      "role": "index",
+      "sha256": "24b4912c776fa3eea69e6ceff26b1445a97ba06532a839a1c062dd7c87aa759b",
+      "size": 347,
+      "normalized_sha256": "24b4912c776fa3eea69e6ceff26b1445a97ba06532a839a1c062dd7c87aa759b"
+    },
+    "ohos/debug-tools-native/CHANGELOG.md": {
+      "role": "index",
+      "sha256": "5256e4268d25f4de0005cabd249355213b0513a67e5a90efbeb589b33f7ebcfb",
+      "size": 1024,
+      "normalized_sha256": "5256e4268d25f4de0005cabd249355213b0513a67e5a90efbeb589b33f7ebcfb"
+    },
+    "ohos/debug-tools-native/Index.ets": {
+      "role": "index",
+      "sha256": "1ae95d3eb64360b4fc7d57d1fce96707e29787340d9efb5fb174d7b0c5806096",
+      "size": 236,
+      "normalized_sha256": "1ae95d3eb64360b4fc7d57d1fce96707e29787340d9efb5fb174d7b0c5806096"
+    },
+    "ohos/debug-tools-native/LICENSE": {
+      "role": "index",
+      "sha256": "c69e86da3fc2081768d5839c99bf63ee397a308f78e6f61cd2babc530a36f9cc",
+      "size": 11356,
+      "normalized_sha256": "c69e86da3fc2081768d5839c99bf63ee397a308f78e6f61cd2babc530a36f9cc"
+    },
+    "ohos/debug-tools-native/README.md": {
+      "role": "index",
+      "sha256": "f9cf031cba625f20e1323b687dfd6fdc779d6a59253c9c740a4ec9c745d89a30",
+      "size": 1206,
+      "normalized_sha256": "f9cf031cba625f20e1323b687dfd6fdc779d6a59253c9c740a4ec9c745d89a30"
+    },
+    "ohos/debug-tools-native/build-profile.json5": {
+      "role": "index",
+      "sha256": "3e0d7b0aab87ea90dd16bede7e0a093d3d781b475c52e6233012eddb078be63e",
+      "size": 93,
+      "normalized_sha256": "3e0d7b0aab87ea90dd16bede7e0a093d3d781b475c52e6233012eddb078be63e"
+    },
+    "ohos/debug-tools-native/hvigorfile.ts": {
+      "role": "index",
+      "sha256": "8c004b8b98616fc371de71759be919b5f94a2c778da75e6501902b9af6d22d40",
+      "size": 103,
+      "normalized_sha256": "8c004b8b98616fc371de71759be919b5f94a2c778da75e6501902b9af6d22d40"
+    },
+    "ohos/debug-tools-native/oh-package-lock.json5": {
+      "role": "index",
+      "sha256": "0f03fb20f46710cfdb1911a34a4b96003dca4d5dad18774adf161501f5f7e5ea",
+      "size": 1271,
+      "normalized_sha256": "0f03fb20f46710cfdb1911a34a4b96003dca4d5dad18774adf161501f5f7e5ea"
+    },
+    "ohos/debug-tools-native/oh-package.json5": {
+      "role": "index",
+      "sha256": "f787c8d2ec7d3bf19e2039479e6794a5520613235c3deaf741550dbec53abf00",
+      "size": 449,
+      "normalized_sha256": "f787c8d2ec7d3bf19e2039479e6794a5520613235c3deaf741550dbec53abf00"
+    },
+    "ohos/debug-tools-native/src/main/ets/GycDebugShakeDetector.ets": {
+      "role": "index",
+      "sha256": "f458dfd09ef68178cddf01bed2a613998c70651429d9c6caeef2bbed407811fe",
+      "size": 2019,
+      "normalized_sha256": "f458dfd09ef68178cddf01bed2a613998c70651429d9c6caeef2bbed407811fe"
+    },
+    "ohos/debug-tools-native/src/main/ets/GycDebugStore.ets": {
+      "role": "index",
+      "sha256": "6cc079e544e0db817b5481e87737236a9b30f329774151578af6c406e9eb5a1d",
+      "size": 9131,
+      "normalized_sha256": "6cc079e544e0db817b5481e87737236a9b30f329774151578af6c406e9eb5a1d"
+    },
+    "ohos/debug-tools-native/src/main/ets/GycDebugToolsModule.ets": {
+      "role": "index",
+      "sha256": "b2df658bad3a20183c9f5e50602bd04cb3dd40b66bdb0f06324aba9774785dec",
+      "size": 4954,
+      "normalized_sha256": "b2df658bad3a20183c9f5e50602bd04cb3dd40b66bdb0f06324aba9774785dec"
+    },
+    "ohos/debug-tools-native/src/main/module.json5": {
+      "role": "index",
+      "sha256": "d9a61a808bc5cb656a479d0e38dc397bbc520f8fd53e6d4691d1470c012dbeef",
+      "size": 187,
+      "normalized_sha256": "d9a61a808bc5cb656a479d0e38dc397bbc520f8fd53e6d4691d1470c012dbeef"
+    },
+    "ohos/debug-tools-native/test/debug-tools.test.cjs": {
+      "role": "index",
+      "sha256": "131af6d7365a7e9aea4ddf2a528da25f483894b7d57c70d0d29911ef5b0c9273",
+      "size": 11725,
+      "normalized_sha256": "131af6d7365a7e9aea4ddf2a528da25f483894b7d57c70d0d29911ef5b0c9273"
+    },
+    "ohos/hvigor/hvigor-config.json5": {
+      "role": "index",
+      "sha256": "01a4a20bc34adffe85e2328cc2314c1128e5f2da4d276dd3e08b2d75100b16c1",
+      "size": 108,
+      "normalized_sha256": "01a4a20bc34adffe85e2328cc2314c1128e5f2da4d276dd3e08b2d75100b16c1"
+    },
+    "ohos/hvigorfile.ts": {
+      "role": "index",
+      "sha256": "284df6f71686f395e87b74419fbe0c34529a647809513fa7944cbcba01908854",
+      "size": 103,
+      "normalized_sha256": "284df6f71686f395e87b74419fbe0c34529a647809513fa7944cbcba01908854"
+    },
+    "ohos/oh-package.json5": {
+      "role": "index",
+      "sha256": "a171a54854013d41fb8711b7ec5b3474e873aa519167ba295b759d95b6769792",
+      "size": 115,
+      "normalized_sha256": "a171a54854013d41fb8711b7ec5b3474e873aa519167ba295b759d95b6769792"
+    },
+    "scripts/build.sh": {
+      "role": "index",
+      "sha256": "5299025e58698ea36e3a8b2a1993472fd72a6a6d4d3c7d5e17d4ea89d77245d8",
+      "size": 2008,
+      "normalized_sha256": "5299025e58698ea36e3a8b2a1993472fd72a6a6d4d3c7d5e17d4ea89d77245d8"
+    },
+    "scripts/check-maven.py": {
+      "role": "index",
+      "sha256": "b14800c5a8ee8c2c760e092cda967286eb33ed7a5cb88e4b8ed15229748de908",
+      "size": 8996,
+      "normalized_sha256": "b14800c5a8ee8c2c760e092cda967286eb33ed7a5cb88e4b8ed15229748de908"
+    },
+    "scripts/check-public-maven.py": {
+      "role": "index",
+      "sha256": "1f38e825e4dd966a4faa18d7315d6536841b03145b3fc0ace366bcde1817b203",
+      "size": 17590,
+      "normalized_sha256": "1f38e825e4dd966a4faa18d7315d6536841b03145b3fc0ace366bcde1817b203"
+    },
+    "scripts/ci-java.security": {
+      "role": "index",
+      "sha256": "798a988a232a7cfe3f73c8e9d14a55368187830bb3f3cc9ce600f9eb0dd77df6",
+      "size": 156,
+      "normalized_sha256": "798a988a232a7cfe3f73c8e9d14a55368187830bb3f3cc9ce600f9eb0dd77df6"
+    },
+    "scripts/ci-repositories.gradle": {
+      "role": "index",
+      "sha256": "81e54dffb76f503f24269d89fb0fb3664346692634da0ca2baadbddfb27320dd",
+      "size": 1269,
+      "normalized_sha256": "81e54dffb76f503f24269d89fb0fb3664346692634da0ca2baadbddfb27320dd"
+    },
+    "scripts/export-maven.sh": {
+      "role": "index",
+      "sha256": "69ca410aa3c0efc2cb3c0e3874bff536e39e704e1a0ee3ed16033bde9f87e096",
+      "size": 83,
+      "normalized_sha256": "69ca410aa3c0efc2cb3c0e3874bff536e39e704e1a0ee3ed16033bde9f87e096"
+    },
+    "scripts/jitpack-metadata.py": {
+      "role": "index",
+      "sha256": "9d6becda7241ba10df34fe335e17fb93904be772868cc9ad4ffae4a8bc74a448",
+      "size": 2999,
+      "normalized_sha256": "9d6becda7241ba10df34fe335e17fb93904be772868cc9ad4ffae4a8bc74a448"
+    },
+    "scripts/package-maven.sh": {
+      "role": "index",
+      "sha256": "64dd44fc3d6b518a7233072e5e52363eb1f664cf00b8fab9ff252ed81f94b7fa",
+      "size": 3191,
+      "normalized_sha256": "64dd44fc3d6b518a7233072e5e52363eb1f664cf00b8fab9ff252ed81f94b7fa"
+    },
+    "scripts/test-package-version.py": {
+      "role": "index",
+      "sha256": "f69e201e36548e0fe31d31693910d0f9f557a7c7750f0e9e34bdeb8d030b62c9",
+      "size": 1326,
+      "normalized_sha256": "f69e201e36548e0fe31d31693910d0f9f557a7c7750f0e9e34bdeb8d030b62c9"
+    },
+    "scripts/verify-release.sh": {
+      "role": "index",
+      "sha256": "55e89e6345c46de4a63f764f60755d4b22dc7be3a33d2a1d2ec6e5dd1db7e98a",
+      "size": 1732,
+      "normalized_sha256": "55e89e6345c46de4a63f764f60755d4b22dc7be3a33d2a1d2ec6e5dd1db7e98a"
+    },
+    "settings.gradle.kts": {
+      "role": "index",
+      "sha256": "e7387b4c9bf089f01372f3fe24755f47c4df45a148bf229bddc8e6aa0c058b4a",
+      "size": 1408,
+      "normalized_sha256": "e7387b4c9bf089f01372f3fe24755f47c4df45a148bf229bddc8e6aa0c058b4a"
+    },
+    "src/androidIosMain/kotlin/com/dgtang/debugtools/bugreport/BugReportViewModel.kt": {
+      "role": "index",
+      "sha256": "d0de656ea213fd056a160be6880d55909d627cf19ba0df8cb067a93a588dc89b",
+      "size": 3694,
+      "normalized_sha256": "d0de656ea213fd056a160be6880d55909d627cf19ba0df8cb067a93a588dc89b"
+    },
+    "src/androidIosTest/kotlin/com/dgtang/debugtools/bugreport/BugReportViewModelTest.kt": {
+      "role": "index",
+      "sha256": "aba9fd4333dc213ab4865c6c56608ec9aa06d4903cacacd83fdffce2ac5f32f0",
+      "size": 11401,
+      "normalized_sha256": "aba9fd4333dc213ab4865c6c56608ec9aa06d4903cacacd83fdffce2ac5f32f0"
+    },
+    "src/androidMain/kotlin/com/dgtang/debugtools/bugreport/AndroidBugReportStore.kt": {
+      "role": "index",
+      "sha256": "94a146b14febaeb67cdf31631e89584aad218d66937144f92c0c871020a69029",
+      "size": 5960,
+      "normalized_sha256": "94a146b14febaeb67cdf31631e89584aad218d66937144f92c0c871020a69029"
+    },
+    "src/androidMain/kotlin/com/dgtang/debugtools/shake/AndroidShakeDetector.kt": {
+      "role": "index",
+      "sha256": "88cf3ade0dd78e46efc6fd13c59ac21848733b4d3b58896c36a2d93a9d63ba7b",
+      "size": 2252,
+      "normalized_sha256": "88cf3ade0dd78e46efc6fd13c59ac21848733b4d3b58896c36a2d93a9d63ba7b"
+    },
+    "src/androidUnitTest/kotlin/com/dgtang/debugtools/bugreport/AndroidBugReportStoreTest.kt": {
+      "role": "index",
+      "sha256": "ec0c510e3d833f49ae181da4738694c6f54468ce539046a9edfacd940609cb23",
+      "size": 1306,
+      "normalized_sha256": "ec0c510e3d833f49ae181da4738694c6f54468ce539046a9edfacd940609cb23"
+    },
+    "src/androidUnitTest/kotlin/com/dgtang/debugtools/kuikly/DebugToolsModuleTest.kt": {
+      "role": "index",
+      "sha256": "7a18dc7d1670267bfa1603e9a47fad8778676c8abf3adcf1cdbcb15963ddd917",
+      "size": 8735,
+      "normalized_sha256": "7a18dc7d1670267bfa1603e9a47fad8778676c8abf3adcf1cdbcb15963ddd917"
+    },
+    "src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugEvidenceFormatter.kt": {
+      "role": "index",
+      "sha256": "86cef1aa3740c42c7c088648dfb1a6a481f49f3dd0ef8a7bc519727f328994f3",
+      "size": 1798,
+      "normalized_sha256": "86cef1aa3740c42c7c088648dfb1a6a481f49f3dd0ef8a7bc519727f328994f3"
+    },
+    "src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportController.kt": {
+      "role": "index",
+      "sha256": "ee46fa367f835e49ace3c6612283346f9c8541c76e6c9456418a14c564c501e8",
+      "size": 16608,
+      "normalized_sha256": "ee46fa367f835e49ace3c6612283346f9c8541c76e6c9456418a14c564c501e8"
+    },
+    "src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportMessages.kt": {
+      "role": "index",
+      "sha256": "23617c45b6a1a995ad40d0648c13aaa8538c6631d8976e1c93c78698a5659a95",
+      "size": 6518,
+      "normalized_sha256": "23617c45b6a1a995ad40d0648c13aaa8538c6631d8976e1c93c78698a5659a95"
+    },
+    "src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportModels.kt": {
+      "role": "index",
+      "sha256": "a34a7f2f2bf5696ed4a7331d2ee20aa5752631cd926cb8061f44b8c6f1f8d96f",
+      "size": 9025,
+      "normalized_sha256": "a34a7f2f2bf5696ed4a7331d2ee20aa5752631cd926cb8061f44b8c6f1f8d96f"
+    },
+    "src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportRepository.kt": {
+      "role": "index",
+      "sha256": "b810328ce2003f71079afea21df04f611954a9cc7d06b37c8784b89372e89905",
+      "size": 15987,
+      "normalized_sha256": "b810328ce2003f71079afea21df04f611954a9cc7d06b37c8784b89372e89905"
+    },
+    "src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportStore.kt": {
+      "role": "index",
+      "sha256": "1623e517286a032d2fe82e30f4b27bb419e64a67eb40c872d3dbbcfa72c5ea30",
+      "size": 1569,
+      "normalized_sha256": "1623e517286a032d2fe82e30f4b27bb419e64a67eb40c872d3dbbcfa72c5ea30"
+    },
+    "src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportWorkspaceStore.kt": {
+      "role": "index",
+      "sha256": "462749d245c8e1cadaac44a1263ebb2fdfcbd0980900001f212431f19022253b",
+      "size": 992,
+      "normalized_sha256": "462749d245c8e1cadaac44a1263ebb2fdfcbd0980900001f212431f19022253b"
+    },
+    "src/commonMain/kotlin/com/dgtang/debugtools/bugreport/NavigationTraceStore.kt": {
+      "role": "index",
+      "sha256": "e165c13068fa4efa18fb9e6e984d39361becf8a28a4bf92ab4b79059f57cd37b",
+      "size": 1219,
+      "normalized_sha256": "e165c13068fa4efa18fb9e6e984d39361becf8a28a4bf92ab4b79059f57cd37b"
+    },
+    "src/commonMain/kotlin/com/dgtang/debugtools/bugreport/ZentaoBugClient.kt": {
+      "role": "index",
+      "sha256": "d51d87bb782b446437320c686decb484144cb6495eaa54137931109f984f3219",
+      "size": 12061,
+      "normalized_sha256": "d51d87bb782b446437320c686decb484144cb6495eaa54137931109f984f3219"
+    },
+    "src/commonMain/kotlin/com/dgtang/debugtools/shake/ShakeDetector.kt": {
+      "role": "index",
+      "sha256": "fcf9072afa96b6fa22894a67ec7b60918e5737bab82e7374d8863a2facb5f96d",
+      "size": 1341,
+      "normalized_sha256": "fcf9072afa96b6fa22894a67ec7b60918e5737bab82e7374d8863a2facb5f96d"
+    },
+    "src/commonTest/kotlin/com/dgtang/debugtools/bugreport/BugEvidenceFormatterTest.kt": {
+      "role": "index",
+      "sha256": "2e898e7e0362400283603beb367a99b062718a98751dea0bdb4cf3884f392c7d",
+      "size": 2142,
+      "normalized_sha256": "2e898e7e0362400283603beb367a99b062718a98751dea0bdb4cf3884f392c7d"
+    },
+    "src/commonTest/kotlin/com/dgtang/debugtools/bugreport/BugReportDraftRecoveryTest.kt": {
+      "role": "index",
+      "sha256": "76e801ac4831f0e9e9def1c06b7fe119e93a10ccef71eb54214b8ac2a8a09d03",
+      "size": 5558,
+      "normalized_sha256": "76e801ac4831f0e9e9def1c06b7fe119e93a10ccef71eb54214b8ac2a8a09d03"
+    },
+    "src/commonTest/kotlin/com/dgtang/debugtools/bugreport/BugReportRepositoryTest.kt": {
+      "role": "index",
+      "sha256": "459332f0c914389a8d5d5cd0579a726fd91b8893deec100df1898873b0d988c0",
+      "size": 6076,
+      "normalized_sha256": "459332f0c914389a8d5d5cd0579a726fd91b8893deec100df1898873b0d988c0"
+    },
+    "src/commonTest/kotlin/com/dgtang/debugtools/bugreport/BugReportStoreKeysTest.kt": {
+      "role": "index",
+      "sha256": "715a5a1e848d13d96f1a19ec4e1c4205ff368c752735aadc40ea82ae39edb549",
+      "size": 683,
+      "normalized_sha256": "715a5a1e848d13d96f1a19ec4e1c4205ff368c752735aadc40ea82ae39edb549"
+    },
+    "src/commonTest/kotlin/com/dgtang/debugtools/bugreport/BugReportWorkspaceTest.kt": {
+      "role": "index",
+      "sha256": "e8c9f09cffbe1491c364c5769dafe925aef9995b745e0f034b5332db565782c6",
+      "size": 18831,
+      "normalized_sha256": "e8c9f09cffbe1491c364c5769dafe925aef9995b745e0f034b5332db565782c6"
+    },
+    "src/commonTest/kotlin/com/dgtang/debugtools/bugreport/NavigationTraceStoreTest.kt": {
+      "role": "index",
+      "sha256": "4551e6b6bdcb3337605c742ade8d851a9273660c64c96504c5055912927b58a5",
+      "size": 510,
+      "normalized_sha256": "4551e6b6bdcb3337605c742ade8d851a9273660c64c96504c5055912927b58a5"
+    },
+    "src/commonTest/kotlin/com/dgtang/debugtools/bugreport/ZentaoBugClientTest.kt": {
+      "role": "index",
+      "sha256": "b07ddc9170333ad492146db1b414fb6c60d22de1a91508a2c7e52e508a6d7cf7",
+      "size": 8017,
+      "normalized_sha256": "b07ddc9170333ad492146db1b414fb6c60d22de1a91508a2c7e52e508a6d7cf7"
+    },
+    "src/commonTest/kotlin/com/dgtang/debugtools/shake/ShakeTriggerTest.kt": {
+      "role": "index",
+      "sha256": "d56e527b42ea457d4eb341e07c2f08d4f243160f63cbb83fe1fa70318c61d362",
+      "size": 1304,
+      "normalized_sha256": "d56e527b42ea457d4eb341e07c2f08d4f243160f63cbb83fe1fa70318c61d362"
+    },
+    "src/iosMain/kotlin/com/dgtang/debugtools/bugreport/IosBugReportStore.kt": {
+      "role": "index",
+      "sha256": "ab95e7f67331b833063754a840d18848d4d353f9c20440d16073ac67a80237b2",
+      "size": 10333,
+      "normalized_sha256": "ab95e7f67331b833063754a840d18848d4d353f9c20440d16073ac67a80237b2"
+    },
+    "src/iosMain/kotlin/com/dgtang/debugtools/shake/IosShakeDetector.kt": {
+      "role": "index",
+      "sha256": "4ac8a42b214e06908012269b8d1123911687e24f14eca4ff382abc3eeb54a18e",
+      "size": 2011,
+      "normalized_sha256": "4ac8a42b214e06908012269b8d1123911687e24f14eca4ff382abc3eeb54a18e"
+    },
+    "src/iosTest/kotlin/com/dgtang/debugtools/bugreport/IosBugReportStoreTest.kt": {
+      "role": "index",
+      "sha256": "f8829009731c5fd7a872d4558790c84d47f3d132f840270f03d855034ad8bc37",
+      "size": 7335,
+      "normalized_sha256": "f8829009731c5fd7a872d4558790c84d47f3d132f840270f03d855034ad8bc37"
+    },
+    "tests/test_jitpack_install.py": {
+      "role": "index",
+      "sha256": "d0136972bd813a6827a903f3c861d08b969baf5d34da2f82c87370ab3cc90368",
+      "size": 6213,
+      "normalized_sha256": "d0136972bd813a6827a903f3c861d08b969baf5d34da2f82c87370ab3cc90368"
+    },
+    "verification-consumer/build.gradle.kts": {
+      "role": "index",
+      "sha256": "a9b83891354530cf6ae93d5a697f4d7f885085f8d768bcd1b19acab049a4dcbc",
+      "size": 1085,
+      "normalized_sha256": "a9b83891354530cf6ae93d5a697f4d7f885085f8d768bcd1b19acab049a4dcbc"
+    },
+    "verification-consumer/gradle.properties": {
+      "role": "index",
+      "sha256": "f36eb4825f12cb1892b70c34ecf6e2b2b0d1953f6bc87c63936ebea5795d21ac",
+      "size": 103,
+      "normalized_sha256": "f36eb4825f12cb1892b70c34ecf6e2b2b0d1953f6bc87c63936ebea5795d21ac"
+    },
+    "verification-consumer/settings.gradle.kts": {
+      "role": "index",
+      "sha256": "ece2fb6ef01d82859fb78ba9fa4cd149f4ca99f9aac20f00eb4a80bb901b02b6",
+      "size": 1447,
+      "normalized_sha256": "ece2fb6ef01d82859fb78ba9fa4cd149f4ca99f9aac20f00eb4a80bb901b02b6"
+    },
+    "verification-consumer/src/androidMain/kotlin/io/github/gycrosskit/debugtools/consumer/AndroidDebugToolsConsumer.kt": {
+      "role": "index",
+      "sha256": "c6083fa800d464f8778838951c916de77846173c6f6100e1528aef993ebe0e15",
+      "size": 971,
+      "normalized_sha256": "c6083fa800d464f8778838951c916de77846173c6f6100e1528aef993ebe0e15"
+    },
+    "verification-consumer/src/commonMain/kotlin/io/github/gycrosskit/debugtools/consumer/DebugToolsConsumer.kt": {
+      "role": "index",
+      "sha256": "87a90de9840b793508c6e7126c04a7f3cc6fa85b2b472236e7d53744318ffe8c",
+      "size": 1588,
+      "normalized_sha256": "87a90de9840b793508c6e7126c04a7f3cc6fa85b2b472236e7d53744318ffe8c"
+    },
+    "verification-consumer/src/iosMain/kotlin/io/github/gycrosskit/debugtools/consumer/IosDebugToolsConsumer.kt": {
+      "role": "index",
+      "sha256": "b66893cd8c87c260646320bb931e5f666511f9536aeff1f6e16b0d119f2a5f8d",
+      "size": 808,
+      "normalized_sha256": "b66893cd8c87c260646320bb931e5f666511f9536aeff1f6e16b0d119f2a5f8d"
+    },
+    "verification-consumer/src/ohosArm64Main/kotlin/io/github/gycrosskit/debugtools/consumer/OhosDebugToolsConsumer.kt": {
+      "role": "index",
+      "sha256": "c88acd9dc45047b2c727737ee55d64df8d751bb986eb620fb53b02b914906d0c",
+      "size": 563,
+      "normalized_sha256": "c88acd9dc45047b2c727737ee55d64df8d751bb986eb620fb53b02b914906d0c"
+    },
+    "verification/ci/test_cache_contract.py": {
+      "role": "index",
+      "sha256": "0a2240e39d87b52386a47fe69ceaea0a61d13a45b52ed8fd067679c05b585f3a",
+      "size": 678,
+      "normalized_sha256": "0a2240e39d87b52386a47fe69ceaea0a61d13a45b52ed8fd067679c05b585f3a"
+    },
+    "verification/keychain/KeychainProbe.kt": {
+      "role": "index",
+      "sha256": "895fed70850f00af891f6cdc2d014d4fd88d712b771e62e50eb334bc1e45d37d",
+      "size": 2465,
+      "normalized_sha256": "895fed70850f00af891f6cdc2d014d4fd88d712b771e62e50eb334bc1e45d37d"
+    },
+    "verification/keychain/KeychainReview.entitlements": {
+      "role": "index",
+      "sha256": "45f02c86b074cac4e03ac936451cb375cb3b0389db0c8ec0aabe4ee62ba3eb07",
+      "size": 435,
+      "normalized_sha256": "45f02c86b074cac4e03ac936451cb375cb3b0389db0c8ec0aabe4ee62ba3eb07"
+    },
+    "verification/keychain/KeychainReview.xcodeproj/project.pbxproj": {
+      "role": "index",
+      "sha256": "8404e9e82729b0a44e067d92dcd618d8b46aecd70372ce77e86a3d073db3052d",
+      "size": 2738,
+      "normalized_sha256": "8404e9e82729b0a44e067d92dcd618d8b46aecd70372ce77e86a3d073db3052d"
+    },
+    "verification/keychain/Main.swift": {
+      "role": "index",
+      "sha256": "f0ee66fb22d9d812748df8353b7daa801a311a37739b8fb092b1c62d0b786fa0",
+      "size": 908,
+      "normalized_sha256": "f0ee66fb22d9d812748df8353b7daa801a311a37739b8fb092b1c62d0b786fa0"
+    },
+    "verification/keychain/verify.sh": {
+      "role": "index",
+      "sha256": "8ca42d943892ccabb68c6a1d5dd7a901bbb8754bf63a7eb62db81b3633be7a0f",
+      "size": 1366,
+      "normalized_sha256": "8ca42d943892ccabb68c6a1d5dd7a901bbb8754bf63a7eb62db81b3633be7a0f"
+    },
+    "verification/test_debug_tools_bridge.py": {
+      "role": "index",
+      "sha256": "712ec7e03d07e84db1e57d0c023539252705246393b3e20c25819228245ddfdb",
+      "size": 3072,
+      "normalized_sha256": "712ec7e03d07e84db1e57d0c023539252705246393b3e20c25819228245ddfdb"
+    }
+  },
+  "managed_scope": {
+    "version": "managed-scope-baseline/v1",
+    "policy_identity": "8d28b84e19128a94f32639591473fb957e1442a990d09030895878dc6bab66ca",
+    "observe_change_policy": "review_required",
+    "budget_policy_identity": "15e9b37a6c57e9bf03c9df3d0d049eb5b9a7f5540f9d34960408114e2538a32d",
+    "budget_policy": {
+      "version": "cognition-budget-policy/v1",
+      "mode": "enforce",
+      "whole_index": {
+        "target_tokens": 200000,
+        "warning_tokens": 300000,
+        "max_tokens": 400000
+      },
+      "r": [
+        {
+          "min_c": 1,
+          "max_c": 4,
+          "target_tokens": 25,
+          "max_tokens": 50
+        },
+        {
+          "min_c": 5,
+          "max_c": 7,
+          "target_tokens": 45,
+          "max_tokens": 90
+        },
+        {
+          "min_c": 8,
+          "max_c": 8,
+          "target_tokens": 70,
+          "max_tokens": 140
+        },
+        {
+          "min_c": 9,
+          "max_c": 9,
+          "target_tokens": 90,
+          "max_tokens": 180
+        }
+      ],
+      "s": [
+        {
+          "min_c": 1,
+          "max_c": 4,
+          "target_tokens": 20,
+          "max_tokens": 40
+        },
+        {
+          "min_c": 5,
+          "max_c": 7,
+          "target_tokens": 40,
+          "max_tokens": 80
+        },
+        {
+          "min_c": 8,
+          "max_c": 8,
+          "target_tokens": 70,
+          "max_tokens": 140
+        },
+        {
+          "min_c": 9,
+          "max_c": 9,
+          "target_tokens": 100,
+          "max_tokens": 200
+        }
+      ]
+    },
+    "apply_authorization_mode": "auto"
+  }
+}
