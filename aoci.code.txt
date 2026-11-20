@@ -1,0 +1,168 @@
+#AOCI-CODE-VOLUME: 1
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/===
+.gitattributes[FC4T]: F:以 LF 检出保持 AOCI 源码字节指纹跨平台稳定 | R:- | A:- | S:-
+.gitignore[FC4T]: F:忽略 Gradle、OHOS 和机器专属开发配置 | R:- | A:- | S:本机 Codex MCP 配置还须从 AOCI Scope 排除
+AGENTS.md[SW8S]: F:规定 Bug 上报的防重状态、凭据隔离与 AOCI 认知维护 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportRepository.kt | A:- | S:超时、取消或丢回执后不得自动重发；本机落盘失败不能让已创建 Bug 重新 POST
+CHANGELOG.md[SO5T]: F:记录 Maven 与 HAR 版本、Kuikly sender 修复及存储键保护历史 | R:code:README.md | A:- | S:准备记录保留原时间语义，当前渠道以根 README 和精确回执为准
+LICENSE[SG3M]: F:声明 Apache 2.0 分发许可及免责条款 | R:- | A:- | S:-
+README.md[SO8S]: F:介绍三端 Bug 上报分层、手动恢复、公开安装与已发布消费边界 | R:code:docs/接入指南.md,code:docs/功能与平台差异.md | A:- | S:宿主提供表单、准入和证据采集；UNKNOWN 须人工核查，发布消费不能代验设备和真实禅道写入
+SHA256SUMS[OV4T]: F:保存历史 debug-tools Maven 归档的 SHA256 摘要 | R:code:docs/版本记录.md | A:- | S:摘要文件不自动证明当前候选或所有渠道字节
+build.gradle.kts[FV7T]: F:构建根 KMP core 与 Android/iOS ViewModel 共享源集并发布完整变体 | R:code:debug-tools-kuikly/build.gradle.kts | A:- | S:公开签名所含 Ktor、协程和序列化必须保持 api；sender 源码另编入 Android unit 回归
+gradle.properties[FV4T]: F:配置 Gradle 堆、UTF-8、AndroidX 与 Kotlin 格式偏好 | R:- | A:- | S:-
+gradlew[EV4S]: F:在 Unix 环境定位 Java 并执行 Gradle Wrapper | R:code:gradle/wrapper/gradle-wrapper.properties | A:- | S:-
+gradlew.bat[EV4T]: F:在 Windows 环境定位 Java 并转发 Wrapper 参数与退出结果 | R:code:gradle/wrapper/gradle-wrapper.properties | A:- | S:-
+jitpack-install.sh[OV8T]: F:下载冻结 Release 并核对来源、摘要和解包边界后安装 Maven 制品 | R:code:tests/test_jitpack_install.py | A:- | S:收据绑定当前 HEAD SHA/tree，拒绝重复字段、链接、逃逸与过量解包
+jitpack.yml[FV5T]: F:固定 JDK21 并调用 debug-tools 冻结归档安装入口 | R:code:jitpack-install.sh | A:- | S:-
+settings.gradle.kts[FV6T]: F:配置插件和依赖镜像并注册 Kuikly 子模块 | R:code:build.gradle.kts,code:debug-tools-kuikly/build.gradle.kts | A:- | S:Eazytec 限定 OHOS fork 版本，Kuikly 独占腾讯仓，避免不完整镜像回退
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/debug-tools-kuikly/===
+build.gradle.kts[FV7T]: F:构建仅 OHOS 的 Kuikly 薄桥并传递根 core API | R:code:debug-tools-kuikly/src/commonMain/kotlin/com/dgtang/debugtools/kuikly/DebugToolsModule.kt | A:- | S:此模块没有 Android/iOS 发布变体，宿主这两端消费根 core 与平台 Store
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/debug-tools-kuikly/src/commonMain/kotlin/com/dgtang/debugtools/kuikly/===
+DebugToolsModule.kt[IO9S]: F:把 Page scope 的存储和摇动操作桥接到 OHOS native 并管理可取消回调 | R:code:ohos/debug-tools-native/src/main/ets/GycDebugToolsModule.ets | A:DebugToolsModule,DebugToolsModule.NAME | S:同一 Kuikly Context 串行使用；20秒超时不保证撤销已开始 IO；预存 callback ref 处理同步回执；dispose 先终止本地等待再尽力原生清理
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/docs/===
+功能与平台差异.md[SO8T]: F:维护三端Bug上报、存储、摇动和恢复合同及历史验证边界 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportController.kt | A:- | S:平台源码定位转交AOCI；历史测试数量和跳过不套作当前通过，安全存储、业务和设备分别留证
+完整审查.md[SO6T]: F:保留rc.3源码审查修复与不可变产物、历史远程消费证据 | R:code:docs/版本记录.md | A:- | S:逐文件职责转交AOCI，旧审核与消费状态不能推导当前Registry或设备验收
+开发与验证.md[SV7M]: F:列出当前构建入口、Kuikly callback 轻量回归与分版本验收证据 | R:code:verification/test_debug_tools_bridge.py,code:scripts/build.sh | A:- | S:Keychain Ignore、替身与编译各有证据边界，现有缓存轻量回归不下载依赖或执行 Native SDK
+接入指南.md[SO8S]: F:定义宿主装配、应用凭据隔离、Page owner 和 UNKNOWN 手动恢复接线 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportRepository.kt | A:- | S:凭据清理保留草稿和 journal；账号切换先撤销旧 owner；稳定 reportId 不得为未知提交换新重发
+版本记录.md[SO5T]: F:保存 RC 与早期版本的修复、发布坐标和远程消费记录 | R:code:docs/开发与验证.md | A:- | S:每版证据绑定原 SHA 与渠道，不能累加为本轮通过
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/gradle/===
+native-toolchain.properties[FV6T]: F:记录 Kotlin Native 版本、目标与缓存 revision | R:code:build.gradle.kts | A:- | S:工具链身份须含 revision 和完整目标集合
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/gradle/wrapper/===
+gradle-wrapper.properties[FV5T]: F:固定 Gradle 8.11.1 分发位置与 SHA256 | R:code:gradlew,code:gradlew.bat | A:- | S:-
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/ohos/AppScope/===
+app.json5[FV4T]: F:声明 OHOS 原生工程包名及应用版本和资源引用 | R:code:ohos/build-profile.json5 | A:- | S:工程应用版本不等于 OHPM 产品版本
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/ohos/===
+build-profile.json5[FV6T]: F:以 HarmonyOS API22 默认产品注册 DebugToolsNative HAR | R:code:ohos/debug-tools-native/build-profile.json5 | A:- | S:声明目标不证明独立 API22 SDK 或真机通过
+hvigorfile.ts[EV4T]: F:将 OHOS 根工程绑定到官方 appTasks | R:code:ohos/build-profile.json5 | A:- | S:-
+oh-package.json5[FV3T]: F:声明 OHOS 原生根工程模型与描述 | R:code:ohos/debug-tools-native/oh-package.json5 | A:- | S:-
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/ohos/debug-tools-native/===
+CHANGELOG.md[SO4T]: F:记录原生 HAR 包的版本准备、桥参数保护与 HUKS 草稿能力 | R:code:ohos/debug-tools-native/README.md | A:- | S:历史候选未发布表述依原日期解释，当前渠道另核回执
+Index.ets[EO7T]: F:公开 native Module、安全 Store 和摇动器的 HAR 入口 | R:code:ohos/debug-tools-native/src/main/ets/GycDebugStore.ets,code:ohos/debug-tools-native/src/main/ets/GycDebugToolsModule.ets | A:GycDebugToolsModule,GycDebugStore,GycDebugStoreOptions,GycDebugShakeDetector | S:宿主单独完成 Renderer 和 Page Module 两端注册
+LICENSE[SG3M]: F:随 HAR 分发 Apache 2.0 授权条款与免责说明 | R:code:LICENSE | A:- | S:-
+README.md[SO7T]: F:说明 OHOS Debug Tools 安装、原生注册和安全存储生命周期 | R:code:docs/接入指南.md | A:- | S:Token 只存 HUKS 密文，升级保持 namespace 与 alias，设备安全存储与传感器另验
+build-profile.json5[FV5T]: F:为 DebugToolsNative HAR 声明 stageMode 默认目标 | R:code:ohos/build-profile.json5 | A:- | S:-
+hvigorfile.ts[EV5T]: F:使用官方 harTasks 构建原生 Debug Tools 模块 | R:code:ohos/debug-tools-native/build-profile.json5 | A:- | S:-
+oh-package-lock.json5[FV6T]: F:锁定 Kuikly Renderer 2.29.1 HAR 摘要与本地 native 类型依赖 | R:code:ohos/debug-tools-native/oh-package.json5 | A:- | S:宿主 Renderer 需统一精确版本，锁文件不能代替 API 与设备兼容验收
+oh-package.json5[FV7T]: F:声明 debug-tools-native 1.0.3 入口及 Renderer 依赖 | R:code:ohos/debug-tools-native/Index.ets | A:- | S:当前依赖固定 2.29.1，版本范围解释以真实 manifest 为准
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/ohos/debug-tools-native/src/main/ets/===
+GycDebugShakeDetector.ets[IH8T]: F:注册加速度传感器并执行阈值、冷却及 generation 迟回调隔离 | R:code:ohos/debug-tools-native/src/main/ets/GycDebugToolsModule.ets | A:GycDebugShakeDetector | S:2.7g/1200ms、100ms采样；timestamp 纳秒转毫秒；stop 保留冷却且 off 失败保留句柄，close 后永不复活
+GycDebugStore.ets[PS9S]: F:以 HUKS AES256-GCM 安全保存 Token 并串行持久化工作区记录 | R:code:ohos/debug-tools-native/src/main/ets/GycDebugToolsModule.ets | A:GycDebugStore,GycDebugStoreOptions | S:同 alias 共享队列；每次随机12字节nonce与namespace AAD；失败不降明文或删密钥；active 控制提交资格，flush 完成才成功；清凭据保留草稿和 journal
+GycDebugToolsModule.ets[IO9T]: F:分派带 requestId 的异步原生存储与摇动请求并在销毁时撤回所有权 | R:code:ohos/debug-tools-native/src/main/ets/GycDebugStore.ets,code:debug-tools-kuikly/src/commonMain/kotlin/com/dgtang/debugtools/kuikly/DebugToolsModule.kt | A:GycDebugToolsModule | S:同实例配置不能换域；拒绝重复id和错类型；取消不保证回滚已开始IO；销毁停止sensor且不回显凭据或异常
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/ohos/debug-tools-native/src/main/===
+module.json5[FV5T]: F:声明 DebugToolsNative HAR 及加速度传感器权限 | R:code:ohos/debug-tools-native/src/main/ets/GycDebugShakeDetector.ets | A:- | S:宿主应用仍须按其运行权限配置接线
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/ohos/debug-tools-native/test/===
+debug-tools.test.cjs[TO8M]: F:用 ArkTS 转译与真实 Node 密码学替身验证 HUKS 存储及 sensor/module 生命周期 | R:code:ohos/debug-tools-native/src/main/ets/GycDebugStore.ets | A:- | S:覆盖nonce、AAD、取消提交资格、同alias串行、HUKS失败恢复与销毁；替身不证明真机系统服务
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/ohos/hvigor/===
+hvigor-config.json5[FV3T]: F:固定 Hvigor 模型并保留执行日志参数入口 | R:code:ohos/hvigorfile.ts | A:- | S:-
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/scripts/===
+build.sh[EV7T]: F:分派三端生产编译、Maven 冻结打包与 Harmony HAR 编译 | R:code:scripts/package-maven.sh | A:- | S:Harmony compile 包含 core、Kuikly KLIB 和生产 HAR，不串联测试或远程消费
+check-maven.py[OV8S]: F:校验 Maven publication、变体文件、许可证、sidecar 和字节码 | R:code:scripts/package-maven.sh | A:check_sidecars,check_jvm_bytecode,resolve_artifact | S:每个变体声明分别核验，SNAPSHOT 按当前 metadata 定位，Android内嵌JAR也检查
+check-public-maven.py[OV8M]: F:核对 JitPack 公开精确标签、源码 SHA、全部 publication 与下载字节 | R:code:scripts/check-maven.py | A:audit,ready_state,validate_state,validate_component,check_sidecars | S:仅等待明确未就绪状态；摘要或身份不符立即失败；精确 POM 访问可触发构建，缺失强摘要 sidecar 单独报告
+ci-java.security[FV4T]: F:设置 CI DNS 正缓存一小时并关闭负缓存 | R:- | A:- | S:仅为冷构建解析缓存，不改变 HTTPS 信任合同
+ci-repositories.gradle[FV7T]: F:按 CI 开关复用编译缓存并修正公共依赖镜像范围 | R:code:scripts/package-maven.sh | A:- | S:行为测试强制实际执行并禁缓存，缓存XML不能充当本轮验证
+export-maven.sh[EV4T]: F:兼容转发到当前 Maven 候选打包入口 | R:code:scripts/package-maven.sh | A:- | S:-
+jitpack-metadata.py[OV7T]: F:正规化 classifier 与空资源变体并更新已有 module sidecar | R:code:scripts/package-maven.sh | A:normalize | S:先验证资源再写入，非空资源不能被删除以伪造兼容
+package-maven.sh[OV8T]: F:以不可变版本生成完整候选 Maven 归档、摘要及本地源码回执 | R:code:scripts/check-maven.py,code:scripts/jitpack-metadata.py | A:- | S:要求 tracked 源码已提交且最终SHA不变；拒绝旧输出但重建该版本 staging；生成本地候选回执不代替受管发布回执
+test-package-version.py[TV6T]: F:只提取生产版本门禁验证 SemVer 与 rc 边界及恶意版本拒绝 | R:code:scripts/package-maven.sh | A:- | S:测试到 repository 赋值前即停止，不执行打包或 SDK
+verify-release.sh[OV8T]: F:核对不可变远程 Tag 的归档来源并验证公开 JitPack 全部产物 | R:code:jitpack-install.sh,code:scripts/check-public-maven.py | A:- | S:预期 publication 从已验摘要的冻结归档提取，不由渠道自报反推；结果保留独立诊断目录
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/src/androidIosMain/kotlin/com/dgtang/debugtools/bugreport/===
+BugReportViewModel.kt[AO7T]: F:把共用 BugReportController 绑定到 Android/iOS ViewModel 生命周期 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportController.kt | A:BugReportViewModel | S:页面结束前由宿主等待 flushDraft，专用client与sensor仍须宿主另行关闭
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/src/androidIosTest/kotlin/com/dgtang/debugtools/bugreport/===
+BugReportViewModelTest.kt[TO8M]: F:验证平台 ViewModel 的初始恢复、表单证据与成功反馈一致性 | R:code:src/androidIosMain/kotlin/com/dgtang/debugtools/bugreport/BugReportViewModel.kt | A:BugReportViewModelTest | S:取消恢复不得变成错误提示，历史刷新失败不能抹掉已知创建结果或重复读取
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/src/androidMain/kotlin/com/dgtang/debugtools/bugreport/===
+AndroidBugReportStore.kt[PS9S]: F:用 Android Keystore 密文 Token 和私有偏好实现设置、历史与工作区 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportStore.kt | A:AndroidBugReportStore | S:五键须不同；草稿/journal切IO且commit确认，坏journal报错；Token解密失败只移除Token，其他记录保留；普通apply不保证立即落盘
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/src/androidMain/kotlin/com/dgtang/debugtools/shake/===
+AndroidShakeDetector.kt[IH8T]: F:在主线程注册加速度计并向无 replay 流交付有冷却的摇动事件 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/shake/ShakeDetector.kt | A:AndroidShakeDetector | S:只注销本实例 listener，elapsedRealtime 提供单调时间；close 为终态，停止保留冷却
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/src/androidUnitTest/kotlin/com/dgtang/debugtools/bugreport/===
+AndroidBugReportStoreTest.kt[TS7T]: F:验证 Android Token 与 journal 键冲突在任何数据更改前被拒绝 | R:code:src/androidMain/kotlin/com/dgtang/debugtools/bugreport/AndroidBugReportStore.kt | A:AndroidBugReportStoreTest | S:Robolectric 不代验 Keystore 真机加解密
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/src/androidUnitTest/kotlin/com/dgtang/debugtools/kuikly/===
+DebugToolsModuleTest.kt[TO8S]: F:以真实 Kuikly Module 和可控 native delegate 验证 callback 所有权及取消销毁 | R:code:debug-tools-kuikly/src/commonMain/kotlin/com/dgtang/debugtools/kuikly/DebugToolsModule.kt | A:DebugToolsModuleTest.senderContracts | S:检查同步回执后异常、keepAlive重启及控制失败仍清理；只替换 native delegate，不证明 OHOS HUKS 或 sensor
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/src/commonMain/kotlin/com/dgtang/debugtools/bugreport/===
+BugEvidenceFormatter.kt[LO7T]: F:限制诊断证据和近期日志的行数与字符数并本地化截断提示 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/ZentaoBugClient.kt | A:BugEvidenceFormatter.bound,BugEvidenceFormatter.boundRecentLogs | S:保留原文且不脱敏；UTF16限长不是字节边界保证，隐私授权由宿主负责
+BugReportController.kt[AO9M]: F:管理页面恢复、草稿自动保存、手动提交恢复及资源化反馈状态 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportRepository.kt | A:BugReportController,BugReportUiState,BugReportSection | S:所有方法与scope同串行UI/Page Context；恢复未成功禁止写入，flush须等恢复和旧保存；已知创建保持成功，自动证据不暴露UI状态
+BugReportMessages.kt[LO7T]: F:提供中性 BugReportNotice 状态码、异常与中英文默认消息 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportController.kt | A:BugReportMessage,BugReportNotice,BugReportLanguage,BugReportException | S:notice 不携带服务端原文，宿主可映射资源；正文语言不翻译诊断原文
+BugReportModels.kt[LO8M]: F:定义目标、稳定草稿、上下文、附件、提交结果与持久防重状态 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportRepository.kt | A:BugReportTarget,BugReportDraft,BugReportAttachment,PendingBugReport,BugSubmissionResult,BugReportHostDataSource | S:草稿不存凭据和自动证据，reportId稳定；最多3附件且各4MiB；CREATED不能重发，UNKNOWN须人工核查
+BugReportRepository.kt[AO9M]: F:协调授权、持久草稿和队列、单次创建、附件确认及本机历史 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/ZentaoBugClient.kt,code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportWorkspaceStore.kt | A:BugReportRepository | S:POST前先落UNKNOWN；远端成功后NonCancellable确认，落盘失败保留成功ID；附件发送前存未知记录，已确认不重传；目标与reportId绑定且无自动重发
+BugReportStore.kt[LS8T]: F:声明安全 Token、设置、历史及独占物理键校验合同 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportWorkspaceStore.kt | A:BugReportStore,requireDistinctStoreKeys | S:clearCredentials 只清 Token；suspend不隐含切线程或可取消系统IO，真实行为由平台实现决定
+BugReportWorkspaceStore.kt[LR9T]: F:声明确认落盘的草稿和完整防重 journal 可选存储合同 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportRepository.kt | A:BugReportWorkspaceStore | S:损坏journal须报错，不能回退空列表绕过防重；旧Store不能伪造支持，工作区不保存凭据或自动证据
+NavigationTraceStore.kt[LO6T]: F:以线程安全有界状态快照保存页面名轨迹 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportModels.kt | A:NavigationTraceStore | S:只trim限80字符和相邻去重，不自动删除URL/query或账号，宿主应传无参数名
+ZentaoBugClient.kt[IN9M]: F:实现显式授权、产品权限检查、Bug创建和附件上传的禅道REST协议 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugEvidenceFormatter.kt | A:ZentaoBugClient | S:专用client拒绝重定向与自动重试；正ID才确认写入；401/403先于正文解析分类；宿主负责TLS和脱敏，原engine生命周期另持有
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/src/commonMain/kotlin/com/dgtang/debugtools/shake/===
+ShakeDetector.kt[LH8T]: F:定义摇动注册结果、无replay事件及共享阈值冷却机制 | R:code:src/androidMain/kotlin/com/dgtang/debugtools/shake/AndroidShakeDetector.kt,code:src/iosMain/kotlin/com/dgtang/debugtools/shake/IosShakeDetector.kt | A:ShakeDetector,ShakeStartResult | S:2.7g和1200ms冷却跨stop保留，close永不可重启；STARTED不保证已有采样
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/src/commonTest/kotlin/com/dgtang/debugtools/bugreport/===
+BugEvidenceFormatterTest.kt[TO7T]: F:验证限长保留最新窗口及诊断敏感原文不被组件改写 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugEvidenceFormatter.kt | A:BugEvidenceFormatterTest | S:原文保留是明确合同，测试通过不能被描述为脱敏完成
+BugReportDraftRecoveryTest.kt[TR9S]: F:验证未调度、挂起、失败和取消的初始恢复不会覆盖旧草稿 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportController.kt | A:BugReportDraftRecoveryTest | S:四个读取阶段失败后所有写入口均须阻断，flush 不能把 loading=false 误判为恢复成功
+BugReportRepositoryTest.kt[TO8S]: F:验证授权、Token持有、本机历史及已知创建结果的失败保护 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportRepository.kt | A:BugReportRepositoryTest | S:使用MockEngine和替身Store，真实禅道写入与安全存储另验；历史保存失败不得重复POST
+BugReportStoreKeysTest.kt[TS7T]: F:枚举五个物理数据键的全部碰撞组合并验证拒绝 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportStore.kt | A:BugReportStoreKeysTest | S:只约束同物理存储键，跨存储同名须由平台合同判断
+BugReportWorkspaceTest.kt[TR9M]: F:验证持久草稿、UNKNOWN防重、手动确认、附件恢复和目标隔离 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportRepository.kt | A:BugReportWorkspaceTest | S:先确认journal落盘再网络写；取消或丢ACK须保留未知；已创建Bug与已确认附件不可重发，Mock不代验云端
+NavigationTraceStoreTest.kt[TO5T]: F:验证轨迹容量与相邻重复页面名去除 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/NavigationTraceStore.kt | A:NavigationTraceStoreTest | S:-
+ZentaoBugClientTest.kt[TN8S]: F:以MockEngine验证禅道授权、权限、Bug正文、附件与失败分类 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/ZentaoBugClient.kt | A:ZentaoBugClientTest | S:协议替身不能证明真实账号权限或实际创建，正ID与401/403的分类须独立断言
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/src/commonTest/kotlin/com/dgtang/debugtools/shake/===
+ShakeTriggerTest.kt[TH7T]: F:验证摇动阈值、冷却边界、回拨时间及非法传感器数据 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/shake/ShakeDetector.kt | A:ShakeTriggerTest | S:弱读数与NaN不能消费或延长冷却，保留初始1200ms窗口
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/src/iosMain/kotlin/com/dgtang/debugtools/bugreport/===
+IosBugReportStore.kt[PS9M]: F:以Keychain、私有偏好和原子文件实现隔离Token及工作区存储 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportWorkspaceStore.kt | A:IosBugReportStore | S:Keychain临时不可用不删凭据；Update仅NotFound才Add，不能先Delete；文件按UTF8编码名判重并排除备份，坏journal报错；构造异常导出Swift
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/src/iosMain/kotlin/com/dgtang/debugtools/shake/===
+IosShakeDetector.kt[IH8T]: F:在主队列采集CoreMotion加速度并按单调时间交付摇动事件 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/shake/ShakeDetector.kt | A:IosShakeDetector | S:100ms采样，registration隔离停止后的迟事件；timestamp秒转毫秒，不使用系统墙钟；close为终态
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/src/iosTest/kotlin/com/dgtang/debugtools/bugreport/===
+IosBugReportStoreTest.kt[TS8S]: F:验证偏好旧键、原子文件重开及存储键隔离，保留Keychain专用回归 | R:code:src/iosMain/kotlin/com/dgtang/debugtools/bugreport/IosBugReportStore.kt | A:IosBugReportStoreTest | S:两项Keychain测试因独立runner无服务显式Ignore，必须签名App-hosted runner验证，不能计为通过
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/tests/===
+test_jitpack_install.py[TV8S]: F:验证冻结debug-tools归档的来源、摘要及安全解包拒绝行为 | R:code:jitpack-install.sh | A:JitPackInstallTest | S:覆盖篡改收据、重复字段、特殊成员和软链逃逸，失败不安装
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/verification-consumer/===
+build.gradle.kts[TV7T]: F:从精确Maven版本编译三端core及仅OHOS的Kuikly桥消费者 | R:code:verification-consumer/settings.gradle.kts | A:- | S:默认1.0.3，消费者不以组件源码替换产物；编译不证明设备或业务行为
+gradle.properties[FV3T]: F:配置独立消费者JVM内存、UTF8和AndroidX | R:- | A:- | S:-
+settings.gradle.kts[TV6T]: F:配置独立消费插件镜像与JitPack精确组件group来源 | R:code:verification-consumer/build.gradle.kts | A:- | S:无mavenLocal或includeBuild，Kuikly使用独占腾讯仓
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/verification-consumer/src/androidMain/kotlin/io/github/gycrosskit/debugtools/consumer/===
+AndroidDebugToolsConsumer.kt[TO6T]: F:编译验证Android Store、摇动器和兼容ViewModel公开API | R:code:src/androidMain/kotlin/com/dgtang/debugtools/bugreport/AndroidBugReportStore.kt | A:AndroidDebugToolsConsumer,consumeLegacyViewModel | S:namespace和alias由宿主注入，不访问生产凭据
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/verification-consumer/src/commonMain/kotlin/io/github/gycrosskit/debugtools/consumer/===
+DebugToolsConsumer.kt[TO7T]: F:以发布API组装Controller并暴露状态、序列化器及摇动合同 | R:code:src/commonMain/kotlin/com/dgtang/debugtools/bugreport/BugReportController.kt | A:DebugToolsConsumer,ShakeConsumer | S:不直接声明传递依赖，产物编译检查公共签名闭包
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/verification-consumer/src/iosMain/kotlin/io/github/gycrosskit/debugtools/consumer/===
+IosDebugToolsConsumer.kt[TO6T]: F:编译验证iOS安全Store、摇动器与兼容ViewModel公开API | R:code:src/iosMain/kotlin/com/dgtang/debugtools/bugreport/IosBugReportStore.kt | A:IosDebugToolsConsumer,consumeLegacyViewModel | S:编译不能替代Keychain真实运行，隔离身份由宿主传入
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/verification-consumer/src/ohosArm64Main/kotlin/io/github/gycrosskit/debugtools/consumer/===
+OhosDebugToolsConsumer.kt[TO6T]: F:编译验证OHOS桥的configure、草稿、摇动和队列接口 | R:code:debug-tools-kuikly/src/commonMain/kotlin/com/dgtang/debugtools/kuikly/DebugToolsModule.kt | A:consumeOhos | S:执行须在所属Page Context，编译不代验native注册
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/verification/ci/===
+test_cache_contract.py[TV5T]: F:检查CI仅复用源码编译缓存且行为测试强制执行的配置合同 | R:code:scripts/ci-repositories.gradle | A:- | S:文本检查不证明线上部署或真实用例运行
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/verification/keychain/===
+KeychainProbe.kt[TS8T]: F:在隔离Simulator App命名空间执行真实生产Store的Keychain替换与工作区保留断言 | R:code:src/iosMain/kotlin/com/dgtang/debugtools/bugreport/IosBugReportStore.kt | A:keychainReplacementCheck | S:只使用fixture凭据并清理自有目录；正常路径不能证明锁屏、更新拒绝或删除失败分支
+KeychainReview.entitlements[TS7T]: F:为隔离Keychain验证App声明应用身份及访问组权限 | R:code:verification/keychain/KeychainReview.xcodeproj/project.pbxproj | A:- | S:测试访问组不能替换为真实用户的生产身份
+Main.swift[TS7T]: F:启动隔离UIKit App并在主队列调用Kotlin真实Keychain断言 | R:code:verification/keychain/KeychainProbe.kt | A:KeychainReviewApp | S:只操作固定review命名空间，输出探针结果后退出
+verify.sh[TV8T]: F:编译当前生产Store和Kotlin探针并构建安装启动签名Simulator App | R:code:verification/keychain/KeychainReview.xcodeproj/project.pbxproj | A:- | S:必须检查实际探针输出，启动成功不等于断言通过；需要可用Simulator和Keychain权限
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/verification/keychain/KeychainReview.xcodeproj/===
+project.pbxproj[TV7T]: F:构建具有Keychain权限的Simulator验证App并链接当前生产Framework | R:code:verification/keychain/Main.swift,code:verification/keychain/KeychainReview.entitlements | A:KeychainReview | S:使用Xcode生成权限段，独立命令行Simulator进程不能冒充App-hosted验证
+
+===/Users/guoyang/.codex/worktrees/aoci-debug-tools/debug-tools/verification/===
+test_debug_tools_bridge.py[TV7T]: F:使用已缓存Kotlin与真实Kuikly模块编译执行sender回调回归 | R:code:src/androidUnitTest/kotlin/com/dgtang/debugtools/kuikly/DebugToolsModuleTest.kt | A:main,artifact | S:缓存缺失直接报错且不下载；只替换native delegate，不执行Gradle或OHOS SDK
